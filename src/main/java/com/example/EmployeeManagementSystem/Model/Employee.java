@@ -6,11 +6,11 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "employee")
+@Table(name = "EMS_EMPLOYEE")
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "EMPLOYEE_ID")
+    @Column(name = "EMPLOYEE_ID",length = 255)
     private long id;
 
     @Column(name="NAME")

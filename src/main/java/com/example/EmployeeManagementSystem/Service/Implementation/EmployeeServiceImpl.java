@@ -14,11 +14,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
     @Override
-    public Employee saveEmployee(String name, String email, String department, String position, int salary) {
+    public Employee saveEmployee(String name, String email, String position,
+                                 String department, int salary) {
 //        Creates new employee object from params
         Employee new_employee = new Employee(name, email, department, position, salary);
 
 //        Saves the employee object and returns a reference to it
-        return employeeRepository.save(new_employee);
+        Employee created_employee =  employeeRepository.save(new_employee);
+        return  created_employee;
     }
 }
