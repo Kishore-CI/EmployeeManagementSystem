@@ -2,7 +2,11 @@ package com.example.EmployeeManagementSystem.Service;
 
 import com.example.EmployeeManagementSystem.Model.Employee;
 
+import java.util.Map;
+import java.util.Objects;
+
 public interface EmployeeService {
-    public Employee saveEmployee(String name, String email, String position,
-                                 String department, int salary);
+    public Employee saveEmployee(Map<String, Object> params);
+
+    public Employee findByEmpId(Long id);
 }

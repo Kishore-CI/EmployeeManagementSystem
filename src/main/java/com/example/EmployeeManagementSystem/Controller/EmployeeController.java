@@ -10,10 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Controller
 public class EmployeeController {
@@ -26,16 +25,12 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/saveEmployee", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> saveEmployee(@RequestParam String name, @RequestParam String email, @RequestParam String position,
-                                       @RequestParam String department, @RequestParam int salary) throws MethodArgumentNotValidException {
+    public ResponseEntity<?> saveEmployee(@RequestBody Map<String,Object> params) throws MethodArgumentNotValidException {
 
-        log.info("saveEmployee : Request received : " + name +" " + email + " "
-        +department+" "+position+" "+salary);
+        log.info("saveEmployee : Request received : " + params);
 
 //        Create the new employee object and save it to the database
-        Employee new_employee = employeeService.saveEmployee(
-                name, email, position, department, salary
-        );
+        Employee new_employee = employeeService.saveEmployee(params);
 //        Return the response object
         return ResponseEntity.status(HttpStatus.CREATED).body(new_employee);
     }
