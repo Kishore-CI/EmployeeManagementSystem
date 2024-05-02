@@ -3,6 +3,7 @@ package com.example.EmployeeManagementSystem.Controller;
 import com.example.EmployeeManagementSystem.Model.Employee;
 import com.example.EmployeeManagementSystem.Service.EmployeeService;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -13,14 +14,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.sql.PreparedStatement;
 import java.util.Map;
 
 @Controller
+@Validated
 public class EmployeeController {
 
     private Logger log = LoggerFactory.getLogger(Employee.class);
@@ -31,7 +33,7 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/saveEmployee", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> saveEmployee(@RequestBody Map<String,Object> params) throws ConstraintViolationException, MethodArgumentTypeMismatchException {
+    public ResponseEntity<?> saveEmployee(@RequestBody @Valid Map<String,Object> params) throws ConstraintViolationException, MethodArgumentTypeMismatchException {
 
 //        log the request data
         log.info("saveEmployee : Request received : " + params);
@@ -45,9 +47,9 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/updateEmployee/{id}", method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> updateEmployee(@PathVariable("id") long id, @RequestParam(required = false) String name,
-                                            @RequestParam(required = false) String email, @RequestParam(required = false) String department,
-                                            @RequestParam(required = false) String position, @RequestParam(required = false) Integer salary) throws MethodArgumentNotValidException {
+    public ResponseEntity<?> updateEmployee(@PathVariable("id") long id, @Valid @RequestParam(required = false) String name,
+                                            @Valid @RequestParam(required = false) String email, @Valid @RequestParam(required = false) String department,
+                                            @Valid @RequestParam(required = false) String position,@Valid @RequestParam(required = false) Integer salary) throws MethodArgumentNotValidException {
 
 //        log the request data
         log.info("updateEmployee : Request Received : {} {} {} {} {} {}" ,id,name,email,department,position,salary);
@@ -137,6 +139,21 @@ public class EmployeeController {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(employee);
+    }
+
+    @RequestMapping(value = "api/v1/json/employee/findEmployeeByDepartmentAndPosition", method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> findEmployeeByDepartmentAndPosition(@RequestParam String department, @RequestParam String position,
+                                                                 @PageableDefault Pageable pageable) throws MethodArgumentTypeMismatchException, MethodArgumentNotValidException{
+//        log the request
+        log.info("findEmployeeByDepartmentAndPosition : requestReceived : {} {}",department,position);
+        Page<Employee> employeePage = employeeService.findByDepartmentAndPosition(department,position,pageable);
+        if(employeePage.getNumberOfElements() == 0){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(employeePage);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(employeePage);
     }
 
     @RequestMapping(value = "api/v1/json/employee/deleteEmployee/{id}", method = RequestMethod.DELETE,

@@ -180,4 +180,16 @@ public class EmployeeServiceImpl implements EmployeeService {
             return employee;
         }
     }
+
+    @Override
+    public Page<Employee> findByDepartmentAndPosition(String department, String position, Pageable pageable) {
+        Page<Employee> employeePage = employeeRepository.findByDepartmentAndPosition(department,position,pageable);
+
+//        if there are no records for the given department then log it as a message
+        if(employeePage.getNumberOfElements() == 0){
+            log.info("No employees found for department : {}, position : {}, on page : {}",department,position,pageable.getPageNumber());
+        }
+
+        return employeePage;
+    }
 }

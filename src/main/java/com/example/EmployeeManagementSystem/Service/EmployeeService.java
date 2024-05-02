@@ -24,4 +24,6 @@ public interface EmployeeService {
     public void deleteAllEmployees();
 
     public Employee updateEmployee(Long id, String name, String email, String department, String position, Integer salary);
+
+    Page<Employee> findByDepartmentAndPosition(String department, String position, Pageable pageable);
 }
