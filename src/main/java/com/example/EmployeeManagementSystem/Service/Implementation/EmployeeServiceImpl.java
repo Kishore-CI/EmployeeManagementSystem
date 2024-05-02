@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -43,7 +44,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 new_employee = new Employee(
                         ((Integer) params.get("id")).longValue(),
                         (String) params.get("name"), (String) params.get("email"),
-                        (String) params.get("position"), (String) params.get("department"),
+                        (String) params.get("department"), (String) params.get("position"),
                         (Integer) params.get("salary")
                 );
 //        Save the newly created employee using the repository
@@ -56,7 +57,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        If employee does not exist, create a new employee with the provided parameters
         new_employee = new Employee(
                 (String) params.get("name"), (String) params.get("email"),
-                (String) params.get("position"), (String) params.get("department"),
+                (String) params.get("department"), (String) params.get("position"),
                 (Integer) params.get("salary")
         );
 //        Save the newly created employee using the repository
@@ -139,7 +140,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee updateEmployee(Long id, Map<String, Object> params) {
+    public Employee updateEmployee(Long id, String name, String email, String department, String position, Integer salary) {
 
 //      Check if the employee with the given id exists
         Employee employee = findByEmpId(id);
@@ -152,22 +153,22 @@ public class EmployeeServiceImpl implements EmployeeService {
 //            }
 //                  --> Produces error on hibernate. Cant change primary key / identifier
 
-            if(params.containsKey("name") && params.get("name") != null){
-                employee.setName(params.get("name").toString());
+            if(name!= null){
+                employee.setName(name);
             }
-            if(params.containsKey("email") && params.get("email") != null){
-                employee.setEmail(params.get("email").toString());
+            if(email!=null){
+                employee.setEmail(email);
             }
-            if(params.containsKey("position") && params.get("position") != null){
-                employee.setPosition(params.get("position").toString());
+            if (department!=null){
+                employee.setDepartment(department);
             }
-            if(params.containsKey("department") && params.get("department") != null){
-                employee.setDepartment(params.get("department").toString());
+            if(position!=null){
+                employee.setPosition(position);
             }
-            if(params.containsKey("salary") && params.get("salary") != null){
-                employee.setSalary((Integer) params.get("salary"));
+            if(salary!=null){
+                employee.setSalary(salary);
             }
-
+//            save the changes made to the employee
             employeeRepository.save(employee);
 
             return employee;

@@ -2,6 +2,7 @@ package com.example.EmployeeManagementSystem.Controller;
 
 import com.example.EmployeeManagementSystem.Model.Employee;
 import com.example.EmployeeManagementSystem.Service.EmployeeService;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.sql.PreparedStatement;
 import java.util.Map;
@@ -29,7 +31,7 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/saveEmployee", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> saveEmployee(@RequestBody Map<String,Object> params) throws MethodArgumentNotValidException {
+    public ResponseEntity<?> saveEmployee(@RequestBody Map<String,Object> params) throws ConstraintViolationException, MethodArgumentTypeMismatchException {
 
 //        log the request data
         log.info("saveEmployee : Request received : " + params);
@@ -43,13 +45,15 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/updateEmployee/{id}", method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> updateEmployee(@PathVariable("id") long id, @RequestBody Map<String,Object> params) throws MethodArgumentNotValidException {
+    public ResponseEntity<?> updateEmployee(@PathVariable("id") long id, @RequestParam(required = false) String name,
+                                            @RequestParam(required = false) String email, @RequestParam(required = false) String department,
+                                            @RequestParam(required = false) String position, @RequestParam(required = false) Integer salary) throws MethodArgumentNotValidException {
 
 //        log the request data
-        log.info("updateEmployee : Request Received : {} {}" ,id,params);
+        log.info("updateEmployee : Request Received : {} {} {} {} {} {}" ,id,name,email,department,position,salary);
 
 //        Attempt updating of employee parameters
-        Employee update_employee = employeeService.updateEmployee(id,params);
+        Employee update_employee = employeeService.updateEmployee(id,name,email,department,position,salary);
 
 //        Return the appropriate HTTP Response based on the result
         if(update_employee == null){

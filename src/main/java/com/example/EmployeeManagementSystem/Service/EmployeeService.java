@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public interface EmployeeService {
     public Employee saveEmployee(Map<String, Object> params);
@@ -22,5 +23,5 @@ public interface EmployeeService {
 
     public void deleteAllEmployees();
 
-    public Employee updateEmployee(Long id,Map<String,Object> params);
+    public Employee updateEmployee(Long id, String name, String email, String department, String position, Integer salary);
 }

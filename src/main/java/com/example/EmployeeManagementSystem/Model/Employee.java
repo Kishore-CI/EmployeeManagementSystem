@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.NumberFormat;
 
 @Entity
 @Table(name = "EMS_EMPLOYEE")
@@ -31,7 +32,8 @@ public class Employee {
     private String position;
 
     @Column(name = "SALARY")
-    @Min(1)
+    @Min(value = 1, message = "Employee's salary cannot be 0")
+    @NumberFormat(style = NumberFormat.Style.NUMBER)
     private int salary;
 
     public Employee() {
