@@ -28,17 +28,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee new_employee = null;
 
 //        Check if there is id parameter present in params Map
-        if(params.containsKey("id") && params.get("id")!= null ) {
+        if(params.containsKey("email") && params.get("email")!= null ) {
 
-            log.info("Id parameter type:" + params.get("id").getClass());
+            log.info("Email parameter type:" + params.get("email").getClass());
 
 //            Check if the employee already exists
-            new_employee = findByEmpId(((Integer)params.get("id")).longValue());
+            new_employee = findByEmail((String)params.get("email"));
 
 //            If employee exists then log it and return an empty employee
             if (new_employee != null) {
-                log.info("saveEmployee -> Employee with id : {} already exists",params.get("id"));
-                return new Employee();
+                log.info("saveEmployee -> Employee with email : {} already exists",params.get("email"));
+                return null;
             }
             else{
                 new_employee = new Employee(
