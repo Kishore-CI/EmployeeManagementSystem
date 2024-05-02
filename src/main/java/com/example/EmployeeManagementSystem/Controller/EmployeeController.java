@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.PreparedStatement;
 import java.util.Map;
 
 @Controller
@@ -82,7 +83,7 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/findEmployee/{id}", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> findEmployee(@PathVariable("id") long id) throws MethodArgumentNotValidException{
+    public ResponseEntity<?> findEmployeeById(@PathVariable("id") long id) throws MethodArgumentNotValidException{
 //        log the request data
         log.info("findEmployee : Request Received : {}",id);
 
@@ -92,6 +93,43 @@ public class EmployeeController {
 //        Return Appropriate HTTP Response
         if(employee == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No such Employee with id : " + id);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(employee);
+    }
+
+    @RequestMapping(value = "api/v1/json/employee/findEmployeeByDepartment", method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> findEmployeeByDepartment(@RequestParam String department, @PageableDefault Pageable pageable) throws MethodArgumentNotValidException{
+//        log the request data
+        log.info("findEmployeeByDepartment : Request Received : {}",department);
+
+//        find all the employees in the department
+        Page<Employee> employeePage = employeeService.findByDepartment(department,pageable);
+
+
+//        Return the response object with appropriate HTTP status
+        if(employeePage.getNumberOfElements() == 0){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(employeePage);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(employeePage);
+    }
+
+    @RequestMapping(value = "api/v1/json/employee/findEmployeeByEmail", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> findEmployeeByEmail(@RequestParam String email) throws MethodArgumentNotValidException{
+//        log the request data
+        log.info("findEmployee : Request Received : {}",email);
+
+//      find the employee
+        Employee employee = employeeService.findByEmail(email);
+
+//        Return Appropriate HTTP Response
+        if(employee == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No such Employee with email : " + email);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(employee);

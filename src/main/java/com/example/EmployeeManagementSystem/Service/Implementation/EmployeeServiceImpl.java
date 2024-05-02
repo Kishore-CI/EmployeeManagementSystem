@@ -75,6 +75,31 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public Employee findByEmail(String email) {
+//        Find employee by their email
+        Employee employee = employeeRepository.findByemail(email);
+
+        if (employee == null){
+            log.info("findByEmail -> No employee with the email : {}",email);
+        }
+
+        return employee;
+    }
+
+    @Override
+    public Page<Employee> findByDepartment(String department, Pageable pageable) {
+//        Find all employees in the same department
+        Page<Employee> employeePage = employeeRepository.findBydepartment(department,pageable);
+
+//        if there are no records for the given department then log it as a message
+        if(employeePage.getNumberOfElements() == 0){
+            log.info("No employees found for department : {} on page : {}",department,pageable.getPageNumber());
+        }
+
+        return employeePage;
+    }
+
+    @Override
     public Page<Employee> findAllEmployees(Pageable pageable) {
         log.info("Pageable object :" + pageable);
 
@@ -121,9 +146,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 //      If employee is present update params as received from the request and return the update employee object
         if(employee != null){
+
 //            if(params.containsKey("id") && params.get("id") != null){
 //                employee.setId(((Integer)params.get("id")).longValue());
 //            }
+//                  --> Produces error on hibernate. Cant change primary key / identifier
+
             if(params.containsKey("name") && params.get("name") != null){
                 employee.setName(params.get("name").toString());
             }
