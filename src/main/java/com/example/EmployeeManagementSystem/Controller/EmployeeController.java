@@ -62,8 +62,8 @@ public class EmployeeController {
         Employee update_employee = employeeService.updateEmployee(id,name,email,department,position,salary);
 
 //        Return the appropriate HTTP Response based on the result
-        if(update_employee == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No such Employee with id : " + id);
+        if(update_employee.getMessage()!=null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(update_employee.getMessage());
         }
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(update_employee);

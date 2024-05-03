@@ -153,12 +153,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 //            }
 //                  --> Produces error on hibernate. Cant change primary key / identifier
 
+            if(email!=null){
+                Employee duplicate_employee = findByEmail(email);
+                if(duplicate_employee == null){
+                    employee.setEmail(email);
+                }
+                else {
+                    log.info("employee with email : {} already exists",email);
+                    return new Employee("Employee with email : "+email+" already exists.");
+                }
+            }
+
             if(name!= null){
                 employee.setName(name);
             }
-            if(email!=null){
-                employee.setEmail(email);
-            }
+
             if (department!=null){
                 employee.setDepartment(department);
             }
@@ -177,7 +186,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        Else log the message and return the null employee object
         else{
             log.info("updateEmployee -> No employee with id : {} exists",id);
-            return employee;
+            return new Employee("No employee with id : "+id+" exists");
         }
     }
 
