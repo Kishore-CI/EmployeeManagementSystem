@@ -38,7 +38,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //            If employee exists then log it and return an empty employee
             if (new_employee != null) {
                 log.info("saveEmployee -> Employee with email : {} already exists",params.get("email"));
-                return null;
+                return new Employee("Employee with email : "+new_employee.getEmail()+" already exists.");
             }
             else{
                 new_employee = new Employee(

@@ -1,5 +1,6 @@
 package com.example.EmployeeManagementSystem.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
@@ -37,6 +38,7 @@ public class Employee {
     private int salary;
 
     @Transient
+    @JsonIgnore
     private String message;
 
     public Employee() {

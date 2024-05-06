@@ -41,8 +41,8 @@ public class EmployeeController {
 //        Create the new employee object and save it to the database
         Employee new_employee = employeeService.saveEmployee(params);
 
-        if(new_employee == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Employee with email : "+params.get("email") + " already exists");
+        if(new_employee.getMessage()!=null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new_employee.getMessage());
         }
 //        Return the response object
         return ResponseEntity.status(HttpStatus.CREATED).body(new_employee);
