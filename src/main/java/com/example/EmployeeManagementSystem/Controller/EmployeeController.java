@@ -40,6 +40,10 @@ public class EmployeeController {
 
 //        Create the new employee object and save it to the database
         Employee new_employee = employeeService.saveEmployee(params);
+
+        if(new_employee.getMessage()!=null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new_employee.getMessage());
+        }
 //        Return the response object
         return ResponseEntity.status(HttpStatus.CREATED).body(new_employee);
     }
@@ -58,8 +62,8 @@ public class EmployeeController {
         Employee update_employee = employeeService.updateEmployee(id,name,email,department,position,salary);
 
 //        Return the appropriate HTTP Response based on the result
-        if(update_employee == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No such Employee with id : " + id);
+        if(update_employee.getMessage()!=null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(update_employee.getMessage());
         }
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(update_employee);

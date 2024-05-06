@@ -28,17 +28,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee new_employee = null;
 
 //        Check if there is id parameter present in params Map
-        if(params.containsKey("id") && params.get("id")!= null ) {
+        if(params.containsKey("email") && params.get("email")!= null ) {
 
-            log.info("Id parameter type:" + params.get("id").getClass());
+            log.info("Email parameter type:" + params.get("email").getClass());
 
 //            Check if the employee already exists
-            new_employee = findByEmpId(((Integer)params.get("id")).longValue());
+            new_employee = findByEmail((String)params.get("email"));
 
 //            If employee exists then log it and return an empty employee
             if (new_employee != null) {
-                log.info("saveEmployee -> Employee with id : {} already exists",params.get("id"));
-                return new Employee();
+                log.info("saveEmployee -> Employee with email : {} already exists",params.get("email"));
+                return new Employee("Employee with email : "+new_employee.getEmail()+" already exists.");
             }
             else{
                 new_employee = new Employee(
@@ -153,12 +153,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 //            }
 //                  --> Produces error on hibernate. Cant change primary key / identifier
 
+            if(email!=null){
+                Employee duplicate_employee = findByEmail(email);
+                if(duplicate_employee == null){
+                    employee.setEmail(email);
+                }
+                else {
+                    log.info("employee with email : {} already exists",email);
+                    return new Employee("Employee with email : "+email+" already exists.");
+                }
+            }
+
             if(name!= null){
                 employee.setName(name);
             }
-            if(email!=null){
-                employee.setEmail(email);
-            }
+
             if (department!=null){
                 employee.setDepartment(department);
             }
@@ -177,7 +186,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        Else log the message and return the null employee object
         else{
             log.info("updateEmployee -> No employee with id : {} exists",id);
-            return employee;
+            return new Employee("No employee with id : "+id+" exists");
         }
     }
 
