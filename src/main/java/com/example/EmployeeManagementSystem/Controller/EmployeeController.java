@@ -1,6 +1,7 @@
 package com.example.EmployeeManagementSystem.Controller;
 
 import com.example.EmployeeManagementSystem.Model.Employee;
+import com.example.EmployeeManagementSystem.Service.EarnedSalaryService;
 import com.example.EmployeeManagementSystem.Service.EmployeeService;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
@@ -29,6 +30,9 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private EarnedSalaryService earnedSalaryService;
 
     @RequestMapping(value = "api/v1/json/employee/saveEmployee", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -203,5 +207,20 @@ public class EmployeeController {
 //      Delete All Employee records
         employeeService.deleteAllEmployees();
         return ResponseEntity.status(HttpStatus.OK).body("All Employee records have been deleted");
+    }
+
+    @RequestMapping(value = "api/v1/json/employee/calculateEarnedSalary/{id}", method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> getEarnedSalary(@PathVariable("id") Long id){
+//        log the request
+        log.info("getEarnedSalary : Request Received : {}",id);
+//        Calculate the earned salary
+        Double earnedSalary = earnedSalaryService.getEarnedSalary(id);
+//        Return appropriate HTTP response
+        if(earnedSalary == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No employee found for id : "+id);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(earnedSalary);
     }
 }
