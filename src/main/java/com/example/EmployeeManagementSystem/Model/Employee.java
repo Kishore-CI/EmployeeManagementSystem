@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.NumberFormat;
 
+import java.util.List;
+
 @Entity
 @Table(name = "EMS_EMPLOYEE")
 public class Employee {
@@ -40,6 +42,9 @@ public class Employee {
     @Transient
     @JsonIgnore
     private String message;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee")
+    private List<Attendance> attendanceList;
 
     public Employee() {
     }

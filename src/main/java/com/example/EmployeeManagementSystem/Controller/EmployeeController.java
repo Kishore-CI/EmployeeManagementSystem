@@ -160,6 +160,20 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.OK).body(employeePage);
     }
 
+    @RequestMapping(value = "api/v1/json/employee/findEmployeeBySalaryRange", method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> findEmployeeBySalaryRange(@RequestParam Integer minSalary, @RequestParam Integer maxSalary,
+                                                       @PageableDefault Pageable pageable) throws MethodArgumentTypeMismatchException{
+//        log the request data
+        log.info("findEmployeeBySalaryRange : requestReceived : {} {} {}",minSalary,maxSalary, pageable);
+        Page<Employee> employeePage = employeeService.findBySalaryBetween(pageable,minSalary,maxSalary);
+        if(employeePage.getNumberOfElements() == 0){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(employeePage);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(employeePage);
+    }
+
     @RequestMapping(value = "api/v1/json/employee/deleteEmployee/{id}", method = RequestMethod.DELETE,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

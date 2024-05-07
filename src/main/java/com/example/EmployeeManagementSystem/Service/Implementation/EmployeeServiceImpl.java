@@ -18,6 +18,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
     private Logger log = LoggerFactory.getLogger(Employee.class);
+
     @Autowired
     private EmployeeRepository employeeRepository;
 
@@ -194,11 +195,25 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Page<Employee> findByDepartmentAndPosition(String department, String position, Pageable pageable) {
         Page<Employee> employeePage = employeeRepository.findByDepartmentAndPosition(department,position,pageable);
 
-//        if there are no records for the given department then log it as a message
+//        if there are no records for the given department.
         if(employeePage.getNumberOfElements() == 0){
             log.info("No employees found for department : {}, position : {}, on page : {}",department,position,pageable.getPageNumber());
         }
 
         return employeePage;
     }
+
+    @Override
+    public Page<Employee> findBySalaryBetween(Pageable pageable, int minSalary, int maxSalary) {
+        Page<Employee> employeePage = employeeRepository.findBySalaryBetween(minSalary, maxSalary, pageable);
+
+//        if there are no records found for the given salary range.
+        if(employeePage.getNumberOfElements() == 0){
+            log.info("No employees found for salary range : {} - {}, on page : {}",minSalary,maxSalary,pageable.getPageNumber());
+        }
+
+        return  employeePage;
+    }
+
+
 }

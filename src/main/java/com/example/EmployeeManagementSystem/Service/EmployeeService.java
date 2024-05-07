@@ -25,5 +25,8 @@ public interface EmployeeService {
 
     public Employee updateEmployee(Long id, String name, String email, String department, String position, Integer salary);
 
-    Page<Employee> findByDepartmentAndPosition(String department, String position, Pageable pageable);
+    public Page<Employee> findByDepartmentAndPosition(String department, String position, Pageable pageable);
+
+    public Page<Employee> findBySalaryBetween(Pageable pageable, int minSalary, int maxSalary);
+
 }
