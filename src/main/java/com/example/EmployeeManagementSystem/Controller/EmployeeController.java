@@ -209,18 +209,5 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.OK).body("All Employee records have been deleted");
     }
 
-    @RequestMapping(value = "api/v1/json/employee/calculateEarnedSalary/{id}", method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<?> getEarnedSalary(@PathVariable("id") Long id){
-//        log the request
-        log.info("getEarnedSalary : Request Received : {}",id);
-//        Calculate the earned salary
-        Double earnedSalary = earnedSalaryService.getEarnedSalary(id);
-//        Return appropriate HTTP response
-        if(earnedSalary == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No employee found for id : "+id);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(earnedSalary);
-    }
+
 }
