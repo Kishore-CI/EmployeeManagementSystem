@@ -50,9 +50,9 @@ public class EarnedSalaryServiceImpl implements EarnedSalaryService {
     }
 
     @Override
-    public Double getEarnedSalary(Long id) {
+    public Double getEarnedSalary(Long id, boolean recalculate) {
 //        log the request data
-        log.info("getEarnedSalary -> {}",id);
+        log.info("getEarnedSalary -> {} {}",id, recalculate);
 
 //        check if the employee exists
         Employee employee = employeeService.findByEmpId(id);
@@ -63,14 +63,14 @@ public class EarnedSalaryServiceImpl implements EarnedSalaryService {
             return null;
         }
 
+
+
 //        check if the earned salary is already calculated for that employee
         EarnedSalary earnedSalaryRecord = earnedSalaryRepository.findByemployee(employee);
 
-//        if not, calculate the earned salary
+//        if not, create and save the record
         if(earnedSalaryRecord == null){
-
-            log.info("Calculating new earned salary record...");
-
+//        calculate the earnedSalary for the employee
             Double earnedSalary = calculateEarnedSalary(employee);
 
 //            create the new earnedSalary record
@@ -79,13 +79,24 @@ public class EarnedSalaryServiceImpl implements EarnedSalaryService {
 //            save the record
             earnedSalaryRepository.save(newEarnedSalaryRecord);
 
-//            return the calculated earned salary
+//            return the newly calculated earnedSalary
             return earnedSalary;
+
+        }
+//        if recalculate flag is true, then update the record with the newly calculated earnedSalary
+        else if(recalculate){
+
+//        calculate the earnedSalary for the employee
+            Double earnedSalary = calculateEarnedSalary(employee);
+
+//            update the earnedSalary record
+            earnedSalaryRecord.setEarned_salary(earnedSalary);
+
+//            save the updated record
+            earnedSalaryRepository.save(earnedSalaryRecord);
         }
 
-        log.info("Earned salary record found : {}",earnedSalaryRecord.toString());
-
-//        return the earned salary from the found record
+//        return the earned salary
         return earnedSalaryRecord.getEarned_salary();
     }
 }

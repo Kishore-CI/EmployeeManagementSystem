@@ -7,5 +7,5 @@ import org.springframework.stereotype.Service;
 public interface EarnedSalaryService {
     public Double calculateEarnedSalary(Employee employee);
 
-    public Double getEarnedSalary(Long id);
+    public Double getEarnedSalary(Long id, boolean recalculate);
 }

@@ -1,5 +1,6 @@
 package com.example.EmployeeManagementSystem.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -21,12 +22,22 @@ public class Attendance {
 
 
     @Temporal(TemporalType.DATE)
+    @Column(name = "attendance_date")
     private LocalDate date;
 
+    @Column(name = "is_present")
     private boolean present;
+
+    @Transient
+    @JsonIgnore
+    private String message;
 
 
     public Attendance() {
+    }
+
+    public Attendance(String message){
+        this.message = message;
     }
 
     public Attendance(Employee employee, LocalDate date, boolean present) {
@@ -82,5 +93,13 @@ public class Attendance {
                 ", date=" + date +
                 ", present=" + present +
                 '}';
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

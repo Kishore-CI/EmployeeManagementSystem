@@ -41,19 +41,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                 log.info("saveEmployee -> Employee with email : {} already exists",params.get("email"));
                 return new Employee("Employee with email : "+new_employee.getEmail()+" already exists.");
             }
-            else{
-                new_employee = new Employee(
-                        ((Integer) params.get("id")).longValue(),
-                        (String) params.get("name"), (String) params.get("email"),
-                        (String) params.get("department"), (String) params.get("position"),
-                        (Integer) params.get("salary")
-                );
-//        Save the newly created employee using the repository
-                Employee saved_employee = employeeRepository.save(new_employee);
-//        return the saved employee
-                return saved_employee;
-            }
-
         }
 //        If employee does not exist, create a new employee with the provided parameters
         new_employee = new Employee(
