@@ -53,9 +53,33 @@ public class AttendanceController {
         List<Attendance> attendanceList = attendanceService.getAttendance(id);
 
         if( attendanceList.size() == 1){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(attendanceList);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(attendanceList.getFirst().getMessage());
         }
 
+        return ResponseEntity.status(HttpStatus.OK).body(attendanceList);
+    }
+
+    @RequestMapping(value = "api/v1/json/attendance/updateAttendanceInBulk/{id}", method = RequestMethod.PUT,
+        produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> updateAttendanceInBulk(@Valid @PathVariable("id") Long id,
+                                                    @Valid @RequestParam LocalDate startDate,
+                                                    @Valid @RequestParam LocalDate endDate,
+                                                    @Valid @RequestParam boolean present){
+
+//        log the request data
+        log.info("updateAttendanceInBulk -> Request Received : {} {} {} {}",id,startDate,endDate,present);
+
+//        Update the attendance for the employee
+        List<Attendance> attendanceList = attendanceService.updateAttendanceForemployeeInBulk(id, startDate, endDate, present);
+
+//        Return the appropriate HTTP response
+        if(attendanceList == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No employee found for the id : "+id);
+        }
+        else if(attendanceList.size() == 1){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(attendanceList.getFirst().getMessage());
+        }
         return ResponseEntity.status(HttpStatus.OK).body(attendanceList);
     }
 

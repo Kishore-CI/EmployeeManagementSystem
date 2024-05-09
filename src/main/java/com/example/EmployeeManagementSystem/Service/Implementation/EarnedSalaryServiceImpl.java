@@ -70,6 +70,7 @@ public class EarnedSalaryServiceImpl implements EarnedSalaryService {
 
 //        if not, create and save the record
         if(earnedSalaryRecord == null){
+
 //        calculate the earnedSalary for the employee
             Double earnedSalary = calculateEarnedSalary(employee);
 

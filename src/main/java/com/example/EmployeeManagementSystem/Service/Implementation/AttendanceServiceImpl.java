@@ -38,13 +38,57 @@ public class AttendanceServiceImpl implements AttendanceService {
         if(employee == null){
             return new Attendance("No employee found for id : "+id);
         }
-        Attendance attendanceRecord = attendanceRepository.findByEmployeeAndDate(employee, date);
+        Attendance attendanceRecord = findAttendanceRecord(employee,date);
         if(attendanceRecord == null){
-            log.info("No attendance record found for employee id : {} on date : {}",id,date);
             return new Attendance("No attendance record found for employee id : "+id+" on date : "+date);
         }
         attendanceRecord.setPresent(present);
         return attendanceRepository.save(attendanceRecord);
+    }
+
+    @Override
+    public List<Attendance> updateAttendanceForemployeeInBulk(Long id, LocalDate startDate, LocalDate endDate, boolean present) {
+//        check if the employee exists
+        Employee employee = findEmployee(id);
+
+//        if the employee is not found return null
+        if(employee == null){
+            return null;
+        }
+
+//        check if the start and end dates are same
+        if(startDate.equals(endDate)){
+            return List.of(new Attendance("start and end dates cannot be the same"));
+        }
+//        check if the start date is valid
+        if(findAttendanceRecord(employee,startDate) == null){
+            return List.of(new Attendance("No attendance record found for employee id : "+id+" on date : "+startDate));
+        }
+
+//        check if the end date is valid
+        if(findAttendanceRecord(employee,endDate) ==null){
+            return List.of(new Attendance("No attendance record found for employee id : "+id+" on date : "+endDate));
+        }
+
+//        find the attendance records between the given dates
+        List<Attendance> attendanceList = attendanceRepository.findByEmployeeAndDateBetween(employee,startDate,endDate);
+
+//        update the attendance records with the given status
+        for(Attendance attendance: attendanceList){
+            attendance.setPresent(present);
+            attendanceRepository.save(attendance);
+        }
+//        return the updated attendance list
+        return attendanceList;
+    }
+
+    @Override
+    public Attendance findAttendanceRecord(Employee employee, LocalDate date) {
+        Attendance attendance = attendanceRepository.findByEmployeeAndDate(employee,date);
+        if(attendance == null){
+            log.info("No attendance record found for employee id : {} on date : {}",employee.getId(),date);
+        }
+        return attendance;
     }
 
     @Override

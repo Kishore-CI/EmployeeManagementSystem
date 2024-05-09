@@ -12,6 +12,10 @@ public interface AttendanceService {
 
     public Attendance updateAttendanceForemployee(Long id, LocalDate date, boolean present);
 
+    public List<Attendance> updateAttendanceForemployeeInBulk(Long id, LocalDate startDate, LocalDate endDate, boolean present);
+
+    public Attendance findAttendanceRecord(Employee employee, LocalDate date);
+
     public Employee findEmployee(Long id);
 
     public List<Attendance> getAttendance(Long id);
