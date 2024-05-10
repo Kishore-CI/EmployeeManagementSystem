@@ -6,6 +6,7 @@ import com.example.EmployeeManagementSystem.Service.EarnedSalaryService;
 import com.example.EmployeeManagementSystem.Service.EmployeeService;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -136,7 +137,7 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/findEmployeeByDepartmentAndPosition", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> findEmployeeByDepartmentAndPosition(@Valid @RequestParam String department, @Valid @RequestParam String position,
+    public ResponseEntity<?> findEmployeeByDepartmentAndPosition(@NotBlank @Valid @RequestParam String department, @Valid @RequestParam String position,
                                                                  @Valid @PageableDefault Pageable pageable) throws ApiRequestException{
 //        log the request
         log.info("findEmployeeByDepartmentAndPosition : requestReceived : {} {}",department,position);

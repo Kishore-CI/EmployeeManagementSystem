@@ -155,22 +155,26 @@ public class EmployeeServiceImpl implements EmployeeService {
             if(email!=null){
                 Employee duplicate_employee = findByEmail(email);
                 if(duplicate_employee == null){
+                    if(email.equals(""))throw new ApiRequestException("Email cannot be empty",HttpStatus.BAD_REQUEST);
                     employee.setEmail(email);
                 }
-                else {
+                else if(employee.getId() != id) {
                     log.info("employee with email : {} already exists",email);
                     throw new ApiRequestException("Employee with email: "+email+" already exists",HttpStatus.BAD_REQUEST); // try custome exception
                 }
             }
 
             if(name!= null){
+                if(name.equals("")) throw new ApiRequestException("Name cannot be empty",HttpStatus.BAD_REQUEST);
                 employee.setName(name);
             }
 
             if (department!=null){
+                if(department.equals("")) throw new ApiRequestException("Department cannot be empty",HttpStatus.BAD_REQUEST);
                 employee.setDepartment(department);
             }
             if(position!=null){
+                if(position.equals("")) throw new ApiRequestException("Position cannot be empty",HttpStatus.BAD_REQUEST);
                 employee.setPosition(position);
             }
             if(salary!=null){
