@@ -2,6 +2,7 @@ package com.example.EmployeeManagementSystem.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -19,29 +20,31 @@ public class Employee {
 
     @Column(name="NAME")
     @NotNull(message = "Employee's Name cannot be null")
+    @Valid
     private String name;
 
     @Column(name = "EMAIL")
     @NotNull(message = "Employee's Email cannot be null")
     @Email
+    @Valid
     private String email;
 
     @Column(name = "DEPARTMENT")
     @NotNull(message = "Employee's Department cannot be null")
+    @Valid
     private String department;
 
     @Column(name = "POSITION")
     @NotNull(message = "Employee's Position cannot be null")
+    @Valid
     private String position;
 
     @Column(name = "SALARY")
     @Min(value = 1, message = "Employee's salary cannot be 0")
     @NumberFormat(style = NumberFormat.Style.NUMBER)
+    @Valid
     private int salary;
 
-    @Transient
-    @JsonIgnore
-    private String message;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee")
     private List<Attendance> attendanceList;
@@ -52,9 +55,6 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(String message){
-        this.message = message;
-    }
 
     public Employee(long id, String name, String email, String department, String position, int salary) {
         this.id = id;
@@ -121,11 +121,4 @@ public class Employee {
         this.salary = salary;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

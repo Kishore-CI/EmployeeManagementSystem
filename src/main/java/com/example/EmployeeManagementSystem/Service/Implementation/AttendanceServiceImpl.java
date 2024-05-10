@@ -1,5 +1,6 @@
 package com.example.EmployeeManagementSystem.Service.Implementation;
 
+import com.example.EmployeeManagementSystem.Exception.ApiRequestException;
 import com.example.EmployeeManagementSystem.Model.Attendance;
 import com.example.EmployeeManagementSystem.Model.Employee;
 import com.example.EmployeeManagementSystem.Repository.AttendanceRepository;
@@ -9,6 +10,7 @@ import org.apache.juli.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -36,11 +38,11 @@ public class AttendanceServiceImpl implements AttendanceService {
     public Attendance updateAttendanceForemployee(Long id, LocalDate date, boolean present) {
         Employee employee = findEmployee(id);
         if(employee == null){
-            return new Attendance("No employee found for id : "+id);
+            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
         }
         Attendance attendanceRecord = findAttendanceRecord(employee,date);
         if(attendanceRecord == null){
-            return new Attendance("No attendance record found for employee id : "+id+" on date : "+date);
+            throw new ApiRequestException("No Attendance record found for employee id: "+id+" on date: "+date,HttpStatus.NOT_FOUND); // try custom exception
         }
         attendanceRecord.setPresent(present);
         return attendanceRepository.save(attendanceRecord);
@@ -53,21 +55,25 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 //        if the employee is not found return null
         if(employee == null){
-            return null;
+            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
         }
 
 //        check if the start and end dates are same
         if(startDate.equals(endDate)){
-            return List.of(new Attendance("start and end dates cannot be the same"));
+            throw new ApiRequestException("Startdate cannot be equal to Enddate",HttpStatus.BAD_REQUEST);
+        }
+
+        if(endDate.isBefore(startDate)){
+            throw new ApiRequestException("EndDate cannot be before StartDate",HttpStatus.BAD_REQUEST);
         }
 //        check if the start date is valid
         if(findAttendanceRecord(employee,startDate) == null){
-            return List.of(new Attendance("No attendance record found for employee id : "+id+" on date : "+startDate));
+            throw new ApiRequestException("Invalid startDate: "+startDate,HttpStatus.BAD_REQUEST);// try custom exception
         }
 
 //        check if the end date is valid
         if(findAttendanceRecord(employee,endDate) ==null){
-            return List.of(new Attendance("No attendance record found for employee id : "+id+" on date : "+endDate));
+            throw new ApiRequestException("Invalid endDate: "+endDate,HttpStatus.BAD_REQUEST);// try custom exception
         }
 
 //        find the attendance records between the given dates
@@ -104,7 +110,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     public List<Attendance> getAttendance(Long id) {
         Employee employee = findEmployee(id);
         if(employee == null){
-            return List.of(new Attendance("No Employee found for id : "+id));
+            throw new ApiRequestException("No employee found for id: "+id, HttpStatus.NOT_FOUND); // try custom exception
         }
         return getAttendanceForemployee(employee);
     }

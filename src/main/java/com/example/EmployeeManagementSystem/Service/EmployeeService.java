@@ -13,13 +13,15 @@ public interface EmployeeService {
 
     public Employee findByEmpId(Long id);
 
+    public Employee findEmployeeById(Long id);
+
     public Employee findByEmail(String email);
 
     public Page<Employee> findByDepartment(String department,Pageable pageable);
 
     public Page<Employee> findAllEmployees(Pageable pageable);
 
-    public Boolean deleteEmployee(Long id);
+    public void deleteEmployee(Long id);
 
     public void deleteAllEmployees();
 

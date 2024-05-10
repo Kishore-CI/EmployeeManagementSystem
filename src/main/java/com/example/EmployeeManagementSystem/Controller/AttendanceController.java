@@ -37,24 +37,17 @@ public class AttendanceController {
 
         Attendance attendance = attendanceService.updateAttendanceForemployee(id,date,present);
 
-        if(attendance.getMessage() != null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(attendance.getMessage());
-        }
         return ResponseEntity.status(HttpStatus.OK).body(attendance);
     }
 
     @RequestMapping(value = "api/v1/json/attendance/getAttendance/{id}", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> getAttendance(@Valid @PathVariable("id") Long id){
+    public ResponseEntity<?> getAttendance(@Valid @PathVariable("id") Long id) throws MethodArgumentTypeMismatchException{
 
         log.info("getAttendance -> Request Received : {}",id);
 
         List<Attendance> attendanceList = attendanceService.getAttendance(id);
-
-        if( attendanceList.size() == 1){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(attendanceList.getFirst().getMessage());
-        }
 
         return ResponseEntity.status(HttpStatus.OK).body(attendanceList);
     }
@@ -65,7 +58,7 @@ public class AttendanceController {
     public ResponseEntity<?> updateAttendanceInBulk(@Valid @PathVariable("id") Long id,
                                                     @Valid @RequestParam LocalDate startDate,
                                                     @Valid @RequestParam LocalDate endDate,
-                                                    @Valid @RequestParam boolean present){
+                                                    @Valid @RequestParam boolean present) throws MethodArgumentTypeMismatchException{
 
 //        log the request data
         log.info("updateAttendanceInBulk -> Request Received : {} {} {} {}",id,startDate,endDate,present);
@@ -74,12 +67,7 @@ public class AttendanceController {
         List<Attendance> attendanceList = attendanceService.updateAttendanceForemployeeInBulk(id, startDate, endDate, present);
 
 //        Return the appropriate HTTP response
-        if(attendanceList == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No employee found for the id : "+id);
-        }
-        else if(attendanceList.size() == 1){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(attendanceList.getFirst().getMessage());
-        }
+
         return ResponseEntity.status(HttpStatus.OK).body(attendanceList);
     }
 

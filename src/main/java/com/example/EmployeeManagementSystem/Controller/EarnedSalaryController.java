@@ -31,9 +31,6 @@ public class EarnedSalaryController {
 //        Calculate the earned salary
         Double earnedSalary = earnedSalaryService.getEarnedSalary(id,recalculate);
 //        Return appropriate HTTP response
-        if(earnedSalary == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No employee found for id : "+id);
-        }
         return ResponseEntity.status(HttpStatus.OK).body(earnedSalary);
     }
 }

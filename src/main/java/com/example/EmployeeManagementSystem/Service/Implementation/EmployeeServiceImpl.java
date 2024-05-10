@@ -1,5 +1,6 @@
 package com.example.EmployeeManagementSystem.Service.Implementation;
 
+import com.example.EmployeeManagementSystem.Exception.ApiRequestException;
 import com.example.EmployeeManagementSystem.Model.Employee;
 import com.example.EmployeeManagementSystem.Repository.EmployeeRepository;
 import com.example.EmployeeManagementSystem.Service.EmployeeService;
@@ -8,10 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -39,7 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //            If employee exists then log it and return an empty employee
             if (new_employee != null) {
                 log.info("saveEmployee -> Employee with email : {} already exists",params.get("email"));
-                return new Employee("Employee with email : "+new_employee.getEmail()+" already exists.");
+                throw new ApiRequestException("Employee with email : "+params.get("email") + " already exists", HttpStatus.BAD_REQUEST); // try custome exception
             }
         }
 //        If employee does not exist, create a new employee with the provided parameters
@@ -64,6 +65,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public Employee findEmployeeById(Long id){
+        Employee employee = findByEmpId(id);
+        if(employee == null){
+            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.BAD_REQUEST);
+        }
+        return employee;
+    }
+
+    @Override
     public Employee findByEmail(String email) {
 //        Find employee by their email
         Employee employee = employeeRepository.findByemail(email);
@@ -83,6 +93,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        if there are no records for the given department then log it as a message
         if(employeePage.getNumberOfElements() == 0){
             log.info("No employees found for department : {} on page : {}",department,pageable.getPageNumber());
+            throw new ApiRequestException("No employees found for department: "+department+" on page: "+pageable.getPageNumber(),HttpStatus.NOT_FOUND);
         }
 
         return employeePage;
@@ -98,19 +109,20 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        if there are no records on the specified page then log it as a message
         if(employeePage.getNumberOfElements() == 0){
             log.info("No employees found on the specified page : {}",pageable.getPageNumber());
+            throw new ApiRequestException("No employees found on page: "+pageable.getPageNumber(),HttpStatus.NOT_FOUND);
         }
         return employeePage;
     }
 
     @Override
-    public Boolean deleteEmployee(Long id) {
+    public void deleteEmployee(Long id) {
 //        Check if the employee with the specified id exists
         Employee employee = findByEmpId(id);
 
 //        If there are no employees with the specified id, log it as a message and return
         if (employee == null){
             log.info("deleteEmployee -> Employee does not exist");
-            return Boolean.FALSE;
+            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.BAD_REQUEST);
         }
 
 //      Delete the employee that was found.
@@ -118,7 +130,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 //        log the message
         log.info("deleteEmployee -> Employee with id : {} has been deleted",id);
-        return Boolean.TRUE;
     }
 
     @Override
@@ -148,7 +159,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 }
                 else {
                     log.info("employee with email : {} already exists",email);
-                    return new Employee("Employee with email : "+email+" already exists.");
+                    throw new ApiRequestException("Employee with email: "+email+" already exists",HttpStatus.BAD_REQUEST); // try custome exception
                 }
             }
 
@@ -174,7 +185,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        Else log the message and return the null employee object
         else{
             log.info("updateEmployee -> No employee with id : {} exists",id);
-            return new Employee("No employee with id : "+id+" exists");
+            throw new ApiRequestException("No employee found for id : "+id,HttpStatus.BAD_REQUEST); // try custom exception
         }
     }
 
@@ -185,6 +196,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        if there are no records for the given department.
         if(employeePage.getNumberOfElements() == 0){
             log.info("No employees found for department : {}, position : {}, on page : {}",department,position,pageable.getPageNumber());
+            throw new ApiRequestException("No employees found on page: "+pageable.getPageNumber(),HttpStatus.NOT_FOUND);
         }
 
         return employeePage;
@@ -197,9 +209,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        if there are no records found for the given salary range.
         if(employeePage.getNumberOfElements() == 0){
             log.info("No employees found for salary range : {} - {}, on page : {}",minSalary,maxSalary,pageable.getPageNumber());
+            throw new ApiRequestException("No employees found on page: "+pageable.getPageNumber(),HttpStatus.NOT_FOUND);
         }
 
-        return  employeePage;
+        return employeePage;
     }
 
 

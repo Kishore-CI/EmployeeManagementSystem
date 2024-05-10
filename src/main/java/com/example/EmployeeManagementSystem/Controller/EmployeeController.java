@@ -1,5 +1,6 @@
 package com.example.EmployeeManagementSystem.Controller;
 
+import com.example.EmployeeManagementSystem.Exception.ApiRequestException;
 import com.example.EmployeeManagementSystem.Model.Employee;
 import com.example.EmployeeManagementSystem.Service.EarnedSalaryService;
 import com.example.EmployeeManagementSystem.Service.EmployeeService;
@@ -37,7 +38,7 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/saveEmployee", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> saveEmployee(@RequestBody @Valid Map<String,Object> params) throws ConstraintViolationException, MethodArgumentTypeMismatchException {
+    public ResponseEntity<?> saveEmployee(@Valid @RequestBody Map<String,Object> params) throws ApiRequestException {
 
 //        log the request data
         log.info("saveEmployee : Request received : " + params);
@@ -45,9 +46,7 @@ public class EmployeeController {
 //        Create the new employee object and save it to the database
         Employee new_employee = employeeService.saveEmployee(params);
 
-        if(new_employee.getMessage()!=null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new_employee.getMessage());
-        }
+
 //        Return the response object
         return ResponseEntity.status(HttpStatus.CREATED).body(new_employee);
     }
@@ -57,7 +56,7 @@ public class EmployeeController {
     @ResponseBody
     public ResponseEntity<?> updateEmployee(@PathVariable("id") long id, @Valid @RequestParam(required = false) String name,
                                             @Valid @RequestParam(required = false) String email, @Valid @RequestParam(required = false) String department,
-                                            @Valid @RequestParam(required = false) String position,@Valid @RequestParam(required = false) Integer salary) throws MethodArgumentNotValidException {
+                                            @Valid @RequestParam(required = false) String position,@Valid @RequestParam(required = false) Integer salary) throws ApiRequestException {
 
 //        log the request data
         log.info("updateEmployee : Request Received : {} {} {} {} {} {}" ,id,name,email,department,position,salary);
@@ -66,9 +65,6 @@ public class EmployeeController {
         Employee update_employee = employeeService.updateEmployee(id,name,email,department,position,salary);
 
 //        Return the appropriate HTTP Response based on the result
-        if(update_employee.getMessage()!=null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(update_employee.getMessage());
-        }
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(update_employee);
 
@@ -77,7 +73,7 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/findAllEmployees", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> findAllEmployees(@PageableDefault Pageable pageable) throws MethodArgumentNotValidException{
+    public ResponseEntity<?> findAllEmployees(@Valid @PageableDefault Pageable pageable) throws ApiRequestException{
 
 //        log the request data
         log.info("findAllEmployees : Request Received : "+ pageable);
@@ -86,9 +82,6 @@ public class EmployeeController {
         Page<Employee> employeePage = employeeService.findAllEmployees(pageable);
 
 //        Return the response object with appropriate HTTP status
-        if(employeePage.getNumberOfElements() == 0){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(employeePage);
-        }
 
         return ResponseEntity.status(HttpStatus.OK).body(employeePage);
 
@@ -97,17 +90,14 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/findEmployee/{id}", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> findEmployeeById(@PathVariable("id") long id) throws MethodArgumentNotValidException{
+    public ResponseEntity<?> findEmployeeById(@Valid @PathVariable("id") Long id) throws ApiRequestException{
 //        log the request data
         log.info("findEmployee : Request Received : {}",id);
 
 //      find the employee
-        Employee employee = employeeService.findByEmpId(id);
+        Employee employee = employeeService.findEmployeeById(id);
 
 //        Return Appropriate HTTP Response
-        if(employee == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No such Employee with id : " + id);
-        }
 
         return ResponseEntity.status(HttpStatus.OK).body(employee);
     }
@@ -115,7 +105,7 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/findEmployeeByDepartment", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> findEmployeeByDepartment(@RequestParam String department, @PageableDefault Pageable pageable) throws MethodArgumentNotValidException{
+    public ResponseEntity<?> findEmployeeByDepartment(@Valid @RequestParam String department, @Valid @PageableDefault Pageable pageable) throws ApiRequestException{
 //        log the request data
         log.info("findEmployeeByDepartment : Request Received : {}",department);
 
@@ -124,9 +114,6 @@ public class EmployeeController {
 
 
 //        Return the response object with appropriate HTTP status
-        if(employeePage.getNumberOfElements() == 0){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(employeePage);
-        }
 
         return ResponseEntity.status(HttpStatus.OK).body(employeePage);
     }
@@ -134,7 +121,7 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/findEmployeeByEmail", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> findEmployeeByEmail(@RequestParam String email) throws MethodArgumentNotValidException{
+    public ResponseEntity<?> findEmployeeByEmail(@Valid @RequestParam String email) throws ApiRequestException{
 //        log the request data
         log.info("findEmployee : Request Received : {}",email);
 
@@ -142,9 +129,6 @@ public class EmployeeController {
         Employee employee = employeeService.findByEmail(email);
 
 //        Return Appropriate HTTP Response
-        if(employee == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No such Employee with email : " + email);
-        }
 
         return ResponseEntity.status(HttpStatus.OK).body(employee);
     }
@@ -152,14 +136,11 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/findEmployeeByDepartmentAndPosition", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> findEmployeeByDepartmentAndPosition(@RequestParam String department, @RequestParam String position,
-                                                                 @PageableDefault Pageable pageable) throws MethodArgumentTypeMismatchException, MethodArgumentNotValidException{
+    public ResponseEntity<?> findEmployeeByDepartmentAndPosition(@Valid @RequestParam String department, @Valid @RequestParam String position,
+                                                                 @Valid @PageableDefault Pageable pageable) throws ApiRequestException{
 //        log the request
         log.info("findEmployeeByDepartmentAndPosition : requestReceived : {} {}",department,position);
         Page<Employee> employeePage = employeeService.findByDepartmentAndPosition(department,position,pageable);
-        if(employeePage.getNumberOfElements() == 0){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(employeePage);
-        }
 
         return ResponseEntity.status(HttpStatus.OK).body(employeePage);
     }
@@ -167,33 +148,28 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/findEmployeeBySalaryRange", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> findEmployeeBySalaryRange(@RequestParam Integer minSalary, @RequestParam Integer maxSalary,
-                                                       @PageableDefault Pageable pageable) throws MethodArgumentTypeMismatchException{
+    public ResponseEntity<?> findEmployeeBySalaryRange(@Valid @RequestParam Integer minSalary, @Valid @RequestParam Integer maxSalary,
+                                                       @Valid @PageableDefault Pageable pageable) throws ApiRequestException{
 //        log the request data
         log.info("findEmployeeBySalaryRange : requestReceived : {} {} {}",minSalary,maxSalary, pageable);
+
         Page<Employee> employeePage = employeeService.findBySalaryBetween(pageable,minSalary,maxSalary);
-        if(employeePage.getNumberOfElements() == 0){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(employeePage);
-        }
+
         return ResponseEntity.status(HttpStatus.OK).body(employeePage);
     }
 
     @RequestMapping(value = "api/v1/json/employee/deleteEmployee/{id}", method = RequestMethod.DELETE,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> deleteEmployee(@PathVariable("id") long id) throws MethodArgumentNotValidException{
+    public ResponseEntity<?> deleteEmployee(@Valid @PathVariable("id") Long id) throws ApiRequestException{
 //        log the request data
         log.info("deleteEmployee : Request Received : " + id);
 
-//        Attempt deletion of the employee
-        Boolean deletionStatus = employeeService.deleteEmployee(id);
+//        delete the employee
+        employeeService.deleteEmployee(id);
 
-//        Return Appropriate HTTP Response
-        if(deletionStatus){
-            return ResponseEntity.status(HttpStatus.OK).body("Employee with id :"+id+" has been deleted");
-        }
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No employee with id : "+id+ " was found");
+//        return appropriate http response
+        return ResponseEntity.status(HttpStatus.OK).body("Employee with id :"+id+" has been deleted");
 
     }
 
