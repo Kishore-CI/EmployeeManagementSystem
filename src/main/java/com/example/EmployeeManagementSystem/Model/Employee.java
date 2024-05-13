@@ -41,6 +41,7 @@ public class Employee {
 
     @Column(name = "SALARY")
     @Min(value = 1, message = "Employee's salary cannot be 0")
+    @NotNull(message = "Employee's salary cannot be null")
     @NumberFormat(style = NumberFormat.Style.NUMBER)
     @Valid
     private int salary;

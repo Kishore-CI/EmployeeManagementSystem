@@ -29,28 +29,62 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        Creates new employee object from params
         Employee new_employee = null;
 
-//        Check if there is id parameter present in params Map
-        if(params.containsKey("email") && params.get("email")!= null ) {
+//        Check if there is email parameter is present and valid in params Map
+        if(params.containsKey("email") && params.get("email")!= null && params.get("email") instanceof String) {
+            if (params.get("email") != "") {
 
-            log.info("Email parameter type:" + params.get("email").getClass());
+//              Check if the employee already exists
+                new_employee = findByEmail((String) params.get("email"));
 
-//            Check if the employee already exists
-            new_employee = findByEmail((String)params.get("email"));
-
-//            If employee exists then log it and return an empty employee
-            if (new_employee != null) {
-                log.info("saveEmployee -> Employee with email : {} already exists",params.get("email"));
-                throw new ApiRequestException("Employee with email : "+params.get("email") + " already exists", HttpStatus.BAD_REQUEST); // try custome exception
+//              If employee exists then log it and return an empty employee
+                if (new_employee != null) {
+                    log.info("saveEmployee -> Employee with email : {} already exists", params.get("email"));
+                    throw new ApiRequestException("Employee with email : " + params.get("email") + " already exists", HttpStatus.BAD_REQUEST); // try custome exception
+                }
+            }
+            else {
+                throw new ApiRequestException("Employee's email cannot be empty",HttpStatus.BAD_REQUEST);
             }
         }
-//        If employee does not exist, create a new employee with the provided parameters
-        new_employee = new Employee(
-                (String) params.get("name"), (String) params.get("email"),
-                (String) params.get("department"), (String) params.get("position"),
-                (Integer) params.get("salary")
-        );
+        else{
+            throw new ApiRequestException("Employee's email is not valid",HttpStatus.BAD_REQUEST);
+        }
+//        If employee does not exist, create a new employee
+        new_employee = new Employee();
+
+//        Validate and assign the received attributes to the new employee
+        if(params.get("name") instanceof String){
+            if(params.get("name").equals("")) throw new ApiRequestException("Employee's Name cannot be empty",HttpStatus.BAD_REQUEST);
+            new_employee.setName((String) params.get("name"));
+        }
+        else throw new ApiRequestException("Employee's Name is of invalid type. Type should be : String ",HttpStatus.BAD_REQUEST);
+
+        if(params.get("email") instanceof String){
+            if(params.get("email").equals("")) throw new ApiRequestException("Employee's email cannot be empty",HttpStatus.BAD_REQUEST);
+            new_employee.setEmail((String) params.get("email"));
+        }
+        else throw new ApiRequestException("Employee's department is of invalid type. Type should be : String ",HttpStatus.BAD_REQUEST);
+
+        if(params.get("department") instanceof String){
+            if(params.get("department").equals("")) throw new ApiRequestException("Employee's department cannot be empty",HttpStatus.BAD_REQUEST);
+            new_employee.setDepartment((String) params.get("department"));
+        }
+        else throw new ApiRequestException("Employee's department is of invalid type. Type should be : String ",HttpStatus.BAD_REQUEST);
+
+        if(params.get("position") instanceof String){
+            if(params.get("position").equals("")) throw new ApiRequestException("Employee's position cannot be empty",HttpStatus.BAD_REQUEST);
+            new_employee.setPosition((String) params.get("position"));
+        }
+        else throw new ApiRequestException("Employee's position is of invalid type. Type should be : String ",HttpStatus.BAD_REQUEST);
+
+        if(params.get("salary") instanceof Integer){
+            new_employee.setSalary((Integer) params.get("salary"));
+        }
+        else throw new ApiRequestException("Employee's Salary is of invalid type. Type should be : Integer ",HttpStatus.BAD_REQUEST);
+
 //        Save the newly created employee using the repository
         Employee saved_employee = employeeRepository.save(new_employee);
+
 //        return the saved employee
         return saved_employee;
     }
