@@ -2,9 +2,7 @@ package com.example.EmployeeManagementSystem.Controller;
 
 import com.example.EmployeeManagementSystem.Exception.ApiRequestException;
 import com.example.EmployeeManagementSystem.Model.Employee;
-import com.example.EmployeeManagementSystem.Service.EarnedSalaryService;
 import com.example.EmployeeManagementSystem.Service.EmployeeService;
-import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.slf4j.LoggerFactory;
@@ -18,9 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Map;
 
@@ -32,9 +28,6 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
-
-    @Autowired
-    private EarnedSalaryService earnedSalaryService;
 
     @RequestMapping(value = "api/v1/json/employee/saveEmployee", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)

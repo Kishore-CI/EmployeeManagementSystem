@@ -8,16 +8,21 @@ import com.example.EmployeeManagementSystem.Repository.EarnedSalaryRepository;
 import com.example.EmployeeManagementSystem.Service.AttendanceService;
 import com.example.EmployeeManagementSystem.Service.EarnedSalaryService;
 import com.example.EmployeeManagementSystem.Service.EmployeeService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.YearMonth;
 import java.util.List;
+import java.util.Optional;
 
-@Service
-public class EarnedSalaryServiceImpl implements EarnedSalaryService {
+@Service("earnedSalaryMonthly")
+public class EarnedSalaryServiceMonthlyImpl implements EarnedSalaryService {
 
     private Logger log = LoggerFactory.getLogger(EarnedSalaryService.class);
 
@@ -31,9 +36,9 @@ public class EarnedSalaryServiceImpl implements EarnedSalaryService {
     private EmployeeService employeeService;
 
     @Override
-    public Double calculateEarnedSalary(Employee employee) {
+    public Double calculateEarnedSalary(Employee employee, LocalDate startdate, LocalDate endDate) {
 //        get the attendance list for the employee
-        List<Attendance> attendanceList = attendanceService.getAttendanceForemployee(employee);
+        List<Attendance> attendanceList = attendanceService.getEmployeeAttendanceBetween(employee,startdate,endDate);
 
 //        calculate the total working days for which the employee was present
         Double totalDaysPresent = (double) attendanceList.stream().filter(Attendance::isPresent).count();
@@ -52,32 +57,49 @@ public class EarnedSalaryServiceImpl implements EarnedSalaryService {
     }
 
     @Override
-    public Double getEarnedSalary(Long id, boolean recalculate) {
+    public Double getEarnedSalary(Long id, boolean recalculate, Optional<Month> month, Optional<LocalDate> startDate, Optional<LocalDate> endDate) {
 //        log the request data
-        log.info("getEarnedSalary -> {} {}",id, recalculate);
+        log.info("getEarnedSalary -> {} {}", id, recalculate);
 
 //        check if the employee exists
         Employee employee = employeeService.findByEmpId(id);
 
 //        if the employee is not found, return null
-        if(employee == null){
-            log.info("No employee found for id : {}",id);
-            throw new ApiRequestException("No employee found for id: "+id, HttpStatus.NOT_FOUND); // try custom exception
+        if (employee == null) {
+            log.info("No employee found for id : {}", id);
+            throw new ApiRequestException("No employee found for id: " + id, HttpStatus.NOT_FOUND); // try custom exception
+        }
+//        Check if the month value from the request is valid
+        int year = 2024;
+        Month monthValue;
+        if (month.isPresent()) {
+            monthValue = Month.valueOf(month.get().toString().toUpperCase());
+        } else {
+            throw new ApiRequestException("Month value cannot be null", HttpStatus.BAD_REQUEST);
+        }
+//        get the first and last days of the month
+        YearMonth yearMonth = YearMonth.of(year, monthValue);
+        LocalDate firsDay = LocalDate.of(year, monthValue, 1);
+        LocalDate lastDay = yearMonth.atEndOfMonth();
+
+//        Check if there are attendance records for the first and last days
+        Attendance firstDayRecord = attendanceService.findAttendanceRecord(employee, firsDay);
+        Attendance lastDayRecord = attendanceService.findAttendanceRecord(employee, lastDay);
+        if (firstDayRecord == null || lastDayRecord == null) {
+            throw new ApiRequestException("Attendance records are not found for the specified month: "+month.get()+" for Employee id: " + id, HttpStatus.NOT_FOUND);
         }
 
-
-
 //        check if the earned salary is already calculated for that employee
-        EarnedSalary earnedSalaryRecord = earnedSalaryRepository.findByemployee(employee);
+        EarnedSalary earnedSalaryRecord = earnedSalaryRepository.findByEmployeeAndMonth(employee, monthValue);
 
 //        if not, create and save the record
-        if(earnedSalaryRecord == null){
+        if (earnedSalaryRecord == null) {
 
 //        calculate the earnedSalary for the employee
-            Double earnedSalary = calculateEarnedSalary(employee);
+            Double earnedSalary = calculateEarnedSalary(employee, firsDay, lastDay);
 
 //            create the new earnedSalary record
-            EarnedSalary newEarnedSalaryRecord = new EarnedSalary(earnedSalary,employee);
+            EarnedSalary newEarnedSalaryRecord = new EarnedSalary(earnedSalary, employee, monthValue);
 
 //            save the record
             earnedSalaryRepository.save(newEarnedSalaryRecord);
@@ -87,13 +109,16 @@ public class EarnedSalaryServiceImpl implements EarnedSalaryService {
 
         }
 //        if recalculate flag is true, then update the record with the newly calculated earnedSalary
-        else if(recalculate){
+        else if (recalculate) {
 
 //        calculate the earnedSalary for the employee
-            Double earnedSalary = calculateEarnedSalary(employee);
+            Double earnedSalary = calculateEarnedSalary(employee, firsDay, lastDay);
 
 //            update the earnedSalary record
             earnedSalaryRecord.setEarned_salary(earnedSalary);
+
+//            update the monthValue
+            earnedSalaryRecord.setMonth(monthValue);
 
 //            save the updated record
             earnedSalaryRepository.save(earnedSalaryRecord);

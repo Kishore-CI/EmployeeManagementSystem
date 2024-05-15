@@ -32,7 +32,7 @@ public class AttendanceThread extends Thread{
 
         log.info("Starting attendance thread...");
 
-        LocalDate startDate = LocalDate.of(2024,5,1);
+        LocalDate startDate = LocalDate.of(2024,4,1);
         LocalDate endDate = LocalDate.of(2024,6,1);
         Random random = new Random();
 

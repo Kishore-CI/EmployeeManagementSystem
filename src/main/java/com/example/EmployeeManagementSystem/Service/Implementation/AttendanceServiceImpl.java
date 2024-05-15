@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 
 @Service
@@ -31,6 +32,12 @@ public class AttendanceServiceImpl implements AttendanceService {
     public List<Attendance> getAttendanceForemployee(Employee employee) {
 //        find the attendanceList for the employee
         List<Attendance> attendanceList = attendanceRepository.findByemployee(employee);
+        return attendanceList;
+    }
+
+    @Override
+    public List<Attendance> getEmployeeAttendanceBetween(Employee employee, LocalDate startDate, LocalDate endDate) {
+        List<Attendance> attendanceList = attendanceRepository.findByEmployeeAndDateBetween(employee,startDate,endDate);
         return attendanceList;
     }
 

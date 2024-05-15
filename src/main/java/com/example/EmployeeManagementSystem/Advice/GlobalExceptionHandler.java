@@ -5,6 +5,7 @@ import com.example.EmployeeManagementSystem.Exception.ApiRequestException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -41,7 +42,27 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Object> handleTypeMismatchException(MethodArgumentTypeMismatchException exception){
-        String message = "Parameter '"+ exception.getPropertyName() +"' requires value of type: "+exception.getRequiredType().toString()+", but received: "+ exception.getValue().toString();
+        String message = "Parameter '"+ exception.getPropertyName() +"' requires value of type: "+exception.getRequiredType().getSimpleName()+", but received: "+ exception.getValue().toString();
+        ApiException apiException = new ApiException(
+                message,
+                HttpStatus.BAD_REQUEST,
+                ZonedDateTime.now(ZoneId.systemDefault())
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiException);
+    }
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArguementException(IllegalArgumentException exception){
+        ApiException apiException = new ApiException(
+                exception.getLocalizedMessage(),
+                HttpStatus.BAD_REQUEST,
+                ZonedDateTime.now(ZoneId.systemDefault())
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiException);
+    }
+
+    @ExceptionHandler(value = MissingServletRequestParameterException.class)
+    public ResponseEntity<Object> handleMissingParameterException(MissingServletRequestParameterException exception){
+        String message = "Parameter: "+exception.getParameterName()+" is required";
         ApiException apiException = new ApiException(
                 message,
                 HttpStatus.BAD_REQUEST,
