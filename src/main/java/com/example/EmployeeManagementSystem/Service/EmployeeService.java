@@ -25,10 +25,13 @@ public interface EmployeeService {
 
     public void deleteAllEmployees();
 
-    public Employee updateEmployee(Long id, String name, String email, String department, String position, Integer salary);
+    public Employee updateEmployee(Long id, String name, String email, String department, String position, Integer salary, Long phone);
 
     public Page<Employee> findByDepartmentAndPosition(String department, String position, Pageable pageable);
 
     public Page<Employee> findBySalaryBetween(Pageable pageable, int minSalary, int maxSalary);
 
+    public Employee findByPhoneNumber(Long phone);
+
+    public Employee findEmployeeByPhoneNumber(Long phone);
 }

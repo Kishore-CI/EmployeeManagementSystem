@@ -27,60 +27,110 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee saveEmployee(Map<String,Object> params){
 //        Creates new employee object from params
-        Employee new_employee = null;
+        Employee new_employee = new Employee();
 
-//        Check if there is email parameter is present and valid in params Map
-        if(params.containsKey("email") && params.get("email")!= null && params.get("email") instanceof String) {
-            if (params.get("email") != "") {
-
-//              Check if the employee already exists
-                new_employee = findByEmail((String) params.get("email"));
-
-//              If employee exists then log it and return an empty employee
-                if (new_employee != null) {
-                    log.info("saveEmployee -> Employee with email : {} already exists", params.get("email"));
-                    throw new ApiRequestException("Employee with email : " + params.get("email") + " already exists", HttpStatus.BAD_REQUEST); // try custome exception
-                }
+//        Check if an email parameter is present in the params and if it is valid
+        if(params.containsKey("email")) {
+            var email = params.get("email");
+            if(email == null){
+                throw new ApiRequestException("Employee's email cannot be null", HttpStatus.BAD_REQUEST);
             }
-            else {
+            if (email == "") {
                 throw new ApiRequestException("Employee's email cannot be empty",HttpStatus.BAD_REQUEST);
             }
+            if(!(email instanceof String)){
+                throw new ApiRequestException("Employee's email is not of valid format. Required format: String",HttpStatus.BAD_REQUEST);
+            }
+
+//          Check if the employee already exists
+            Employee duplicate_employee = findByEmail((String) email);
+
+//              If employee exists then log it and return an empty employee
+            if (duplicate_employee != null) {
+                log.info("saveEmployee -> Employee with email : {} already exists", email);
+                throw new ApiRequestException("Employee with email : " + email + " already exists", HttpStatus.BAD_REQUEST); // try custome exception
+            }
+//            provide the email attribute value for the new employee
+            new_employee.setEmail((String) email);
         }
         else{
-            throw new ApiRequestException("Employee's email is not valid",HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("Employee's email is required",HttpStatus.BAD_REQUEST);
         }
-//        If employee does not exist, create a new employee
-        new_employee = new Employee();
 
-//        Validate and assign the received attributes to the new employee
-        if(params.get("name") instanceof String){
-            if(params.get("name").equals("")) throw new ApiRequestException("Employee's Name cannot be empty",HttpStatus.BAD_REQUEST);
-            new_employee.setName((String) params.get("name"));
-        }
-        else throw new ApiRequestException("Employee's Name is of invalid type. Type should be : String ",HttpStatus.BAD_REQUEST);
+//        check if a phone number parameter is present in the params map and if it is valid
+        if(params.containsKey("phone")){
+            var phone = params.get("phone");
+            if(phone == null){
+                throw new ApiRequestException("Employee's phone number cannot be null",HttpStatus.BAD_REQUEST);
+            }
+            if(phone instanceof Integer){
+                throw new ApiRequestException("Employee's phone number length is below required length. Required length: 10",HttpStatus.BAD_REQUEST);
+            }
+            if(!(phone instanceof  Long)){
+                throw new ApiRequestException("Employee's phone number is of invalid format. Require format: Long",HttpStatus.BAD_REQUEST);
+            }
 
-        if(params.get("email") instanceof String){
-            if(params.get("email").equals("")) throw new ApiRequestException("Employee's email cannot be empty",HttpStatus.BAD_REQUEST);
-            new_employee.setEmail((String) params.get("email"));
-        }
-        else throw new ApiRequestException("Employee's department is of invalid type. Type should be : String ",HttpStatus.BAD_REQUEST);
+//            check if the phone number is already associated with another employee
+            Employee duplicate_employee = findByPhoneNumber((Long) phone);
 
-        if(params.get("department") instanceof String){
-            if(params.get("department").equals("")) throw new ApiRequestException("Employee's department cannot be empty",HttpStatus.BAD_REQUEST);
-            new_employee.setDepartment((String) params.get("department"));
-        }
-        else throw new ApiRequestException("Employee's department is of invalid type. Type should be : String ",HttpStatus.BAD_REQUEST);
+            if(duplicate_employee != null){
+                log.info("saveEmployee -> Employee with phone number: {} already exists",phone);
+                throw new ApiRequestException("Employee with phone number: "+phone+" already exists",HttpStatus.BAD_REQUEST);
+            }
 
-        if(params.get("position") instanceof String){
-            if(params.get("position").equals("")) throw new ApiRequestException("Employee's position cannot be empty",HttpStatus.BAD_REQUEST);
-            new_employee.setPosition((String) params.get("position"));
+//            provide the phone number value for the new employee
+            new_employee.setPhone((Long) phone);
         }
-        else throw new ApiRequestException("Employee's position is of invalid type. Type should be : String ",HttpStatus.BAD_REQUEST);
+        else{
+            throw new ApiRequestException("Employee phone number is required",HttpStatus.BAD_REQUEST);
+        }
 
-        if(params.get("salary") instanceof Integer){
-            new_employee.setSalary((Integer) params.get("salary"));
+//        Validate and assign the remaining attributes to the new employee
+        var name = params.get("name");
+        if(name != null){
+            if(name.equals("")) {
+                throw new ApiRequestException("Employee's Name cannot be null or empty", HttpStatus.BAD_REQUEST);
+            }
+            if(!(name instanceof String)){
+                throw new ApiRequestException("Employee's Name is of invalid type. Type should be : String ",HttpStatus.BAD_REQUEST);
+            }
+            new_employee.setName((String) name);
         }
-        else throw new ApiRequestException("Employee's Salary is of invalid type. Type should be : Integer ",HttpStatus.BAD_REQUEST);
+        else throw new ApiRequestException("Employee's name cannot be null",HttpStatus.BAD_REQUEST);
+
+        var department = params.get("department");
+        if(department != null){
+            if(department.equals("")) {
+                throw new ApiRequestException("Employee's department cannot be empty", HttpStatus.BAD_REQUEST);
+            }
+            if(!(department instanceof String)){
+                throw new ApiRequestException("Employee's department is of invalid type. Type should be : String ",HttpStatus.BAD_REQUEST);
+            }
+            new_employee.setDepartment((String) department);
+        }
+        else throw new ApiRequestException("Employee's department cannot be null",HttpStatus.BAD_REQUEST);
+
+        var position = params.get("position");
+        if(position != null){
+            if(position.equals("")) {
+                throw new ApiRequestException("Employee's position cannot be empty", HttpStatus.BAD_REQUEST);
+            }
+            if(!(position instanceof String)){
+                throw new ApiRequestException("Employee's position is of invalid type. Type should be : String ",HttpStatus.BAD_REQUEST);
+            }
+            new_employee.setPosition((String) position);
+        }
+        else throw new ApiRequestException("Employee's position cannot be null",HttpStatus.BAD_REQUEST);
+
+        var salary = params.get("salary");
+        if(salary != null){
+            if(!(salary instanceof Integer)){
+                throw new ApiRequestException("Employee's Salary is of invalid type. Type should be : Integer ",HttpStatus.BAD_REQUEST);
+            }
+            new_employee.setSalary((Integer) salary);
+        }
+        else throw new ApiRequestException("Employee's Salary cannot be null",HttpStatus.BAD_REQUEST);
+
 
 //        Save the newly created employee using the repository
         Employee saved_employee = employeeRepository.save(new_employee);
@@ -173,7 +223,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee updateEmployee(Long id, String name, String email, String department, String position, Integer salary) {
+    public Employee updateEmployee(Long id, String name, String email, String department, String position, Integer salary, Long phone) {
 
 //      Check if the employee with the given id exists
         Employee employee = findByEmpId(id);
@@ -189,26 +239,41 @@ public class EmployeeServiceImpl implements EmployeeService {
             if(email!=null){
                 Employee duplicate_employee = findByEmail(email);
                 if(duplicate_employee == null){
-                    if(email.equals(""))throw new ApiRequestException("Email cannot be empty",HttpStatus.BAD_REQUEST);
+                    if(email.isEmpty())throw new ApiRequestException("Email cannot be empty",HttpStatus.BAD_REQUEST);
                     employee.setEmail(email);
                 }
+//                to ensure that giving the current email address for the same employee does not count as an exception case
                 else if(employee.getId() != id) {
                     log.info("employee with email : {} already exists",email);
                     throw new ApiRequestException("Employee with email: "+email+" already exists",HttpStatus.BAD_REQUEST); // try custome exception
                 }
             }
 
+            if(phone!=null){
+
+                Employee duplicate_employee = findByPhoneNumber(phone);
+                if(duplicate_employee == null){
+                    employee.setPhone(phone);
+                }
+//                to ensure that giving the current phone number for the same employee does not count as an exception case
+                else if (employee.getId() != id) {
+                    log.info("Employee with phone number : {} already exists",phone);
+                    throw new ApiRequestException("Employe with phone number: "+phone+" already exists.",HttpStatus.BAD_REQUEST);
+                }
+
+            }
+
             if(name!= null){
-                if(name.equals("")) throw new ApiRequestException("Name cannot be empty",HttpStatus.BAD_REQUEST);
+                if(name.isEmpty()) throw new ApiRequestException("Name cannot be empty",HttpStatus.BAD_REQUEST);
                 employee.setName(name);
             }
 
             if (department!=null){
-                if(department.equals("")) throw new ApiRequestException("Department cannot be empty",HttpStatus.BAD_REQUEST);
+                if(department.isEmpty()) throw new ApiRequestException("Department cannot be empty",HttpStatus.BAD_REQUEST);
                 employee.setDepartment(department);
             }
             if(position!=null){
-                if(position.equals("")) throw new ApiRequestException("Position cannot be empty",HttpStatus.BAD_REQUEST);
+                if(position.isEmpty()) throw new ApiRequestException("Position cannot be empty",HttpStatus.BAD_REQUEST);
                 employee.setPosition(position);
             }
             if(salary!=null){
@@ -251,6 +316,28 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         return employeePage;
+    }
+
+    @Override
+    public Employee findByPhoneNumber(Long phone) {
+        Employee employee = employeeRepository.findByphone(phone);
+
+        if(employee==null){
+            log.info("findByPhoneNumber -> No employee with phone number: {}",phone);
+        }
+
+        return employee;
+    }
+
+    @Override
+    public Employee findEmployeeByPhoneNumber(Long phone) {
+        Employee employee = findByPhoneNumber(phone);
+
+        if(employee == null){
+            throw new ApiRequestException("No employee with phone number: "+phone,HttpStatus.BAD_REQUEST);
+        }
+
+        return employee;
     }
 
 

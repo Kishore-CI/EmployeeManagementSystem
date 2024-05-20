@@ -3,9 +3,7 @@ package com.example.EmployeeManagementSystem.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.NumberFormat;
 
 import java.util.List;
@@ -28,6 +26,13 @@ public class Employee {
     @Email
     @Valid
     private String email;
+
+    @Column(name = "PHONE_NUMBER")
+    @NotNull(message = "Employee's Phone number cannot be null")
+    @Min(value = 1000000000L, message = "Phone number is below valid length")
+    @Max(value = 9999999999L, message = "Phone number is beyond valid length")
+    @Valid
+    private long phone;
 
     @Column(name = "DEPARTMENT")
     @NotNull(message = "Employee's Department cannot be null")
@@ -57,18 +62,20 @@ public class Employee {
     }
 
 
-    public Employee(long id, String name, String email, String department, String position, int salary) {
+    public Employee(long id, String name, String email, Long phone, String department, String position, int salary) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.phone = phone;
         this.department = department;
         this.position = position;
         this.salary = salary;
     }
 
-    public Employee(String name, String email, String department, String position, int salary) {
+    public Employee(String name, String email, Long phone, String department, String position, int salary) {
         this.name = name;
         this.email = email;
+        this.phone = phone;
         this.department = department;
         this.position = position;
         this.salary = salary;
@@ -122,4 +129,11 @@ public class Employee {
         this.salary = salary;
     }
 
+    public Long getPhone() {
+        return phone;
+    }
+
+    public void setPhone(Long phone) {
+        this.phone = phone;
+    }
 }

@@ -5,6 +5,7 @@ import com.example.EmployeeManagementSystem.Model.Employee;
 import com.example.EmployeeManagementSystem.Service.EmployeeService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -50,13 +51,14 @@ public class EmployeeController {
     @ResponseBody
     public ResponseEntity<?> updateEmployee(@PathVariable("id") long id, @Valid @RequestParam(required = false) String name,
                                             @Valid @RequestParam(required = false) String email, @Valid @RequestParam(required = false) String department,
-                                            @Valid @RequestParam(required = false) String position,@Valid @RequestParam(required = false) Integer salary) throws ApiRequestException {
+                                            @Valid @RequestParam(required = false) String position,@Valid @RequestParam(required = false) Integer salary,
+                                            @Valid @RequestParam(required = false) Long phone) throws ApiRequestException {
 
 //        log the request data
         log.info("updateEmployee : Request Received : {} {} {} {} {} {}" ,id,name,email,department,position,salary);
 
 //        Attempt updating of employee parameters
-        Employee update_employee = employeeService.updateEmployee(id,name,email,department,position,salary);
+        Employee update_employee = employeeService.updateEmployee(id,name,email,department,position,salary,phone);
 
 //        Return the appropriate HTTP Response based on the result
 
@@ -137,6 +139,18 @@ public class EmployeeController {
         Page<Employee> employeePage = employeeService.findByDepartmentAndPosition(department,position,pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(employeePage);
+    }
+
+    @RequestMapping(value = "api/v1/json/employee/findEmployeeByPhone", method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> findEmployeeByPhoneNumber(@NotBlank @Valid @RequestParam Long phone){
+//        log the request
+        log.info("findEmployeeByPhone : request received : {}",phone);
+
+        Employee employee = employeeService.findEmployeeByPhoneNumber(phone);
+
+        return ResponseEntity.status(HttpStatus.OK).body(employee);
     }
 
     @RequestMapping(value = "api/v1/json/employee/findEmployeeBySalaryRange", method = RequestMethod.GET,

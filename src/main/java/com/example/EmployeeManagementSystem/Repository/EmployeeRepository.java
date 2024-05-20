@@ -18,4 +18,6 @@ public interface EmployeeRepository extends JpaRepository<Employee,Long> {
     public Page<Employee> findByDepartmentAndPosition(String department, String position, Pageable pageable);
 
     public Page<Employee> findBySalaryBetween(int minSalary, int maxSalary, Pageable pageable);
+
+    public Employee findByphone(Long phone);
 }
