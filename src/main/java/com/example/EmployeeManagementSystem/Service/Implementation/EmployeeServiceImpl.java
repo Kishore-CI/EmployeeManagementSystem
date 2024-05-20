@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -152,7 +153,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee findEmployeeById(Long id){
         Employee employee = findByEmpId(id);
         if(employee == null){
-            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
         }
         return employee;
     }
@@ -206,7 +207,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        If there are no employees with the specified id, log it as a message and return
         if (employee == null){
             log.info("deleteEmployee -> Employee does not exist");
-            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
         }
 
 //      Delete the employee that was found.
@@ -288,7 +289,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        Else log the message and return the null employee object
         else{
             log.info("updateEmployee -> No employee with id : {} exists",id);
-            throw new ApiRequestException("No employee found for id : "+id,HttpStatus.BAD_REQUEST); // try custom exception
+            throw new ApiRequestException("No employee found for id : "+id,HttpStatus.NOT_FOUND); // try custom exception
         }
     }
 
@@ -314,18 +315,15 @@ public class EmployeeServiceImpl implements EmployeeService {
             log.info("No employees found for salary range : {} - {}, on page : {}",minSalary,maxSalary,pageable.getPageNumber());
             throw new ApiRequestException("No employees found on page: "+pageable.getPageNumber(),HttpStatus.NOT_FOUND);
         }
-
         return employeePage;
     }
 
     @Override
     public Employee findByPhoneNumber(Long phone) {
         Employee employee = employeeRepository.findByphone(phone);
-
         if(employee==null){
             log.info("findByPhoneNumber -> No employee with phone number: {}",phone);
         }
-
         return employee;
     }
 
@@ -334,10 +332,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = findByPhoneNumber(phone);
 
         if(employee == null){
-            throw new ApiRequestException("No employee with phone number: "+phone,HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("No employee with phone number: "+phone,HttpStatus.NOT_FOUND);
         }
-
         return employee;
+    }
+
+    @Override
+    public List<Employee> findAll() {
+        return employeeRepository.findAll();
     }
 
 

@@ -10,6 +10,10 @@ import java.util.List;
 public interface AttendanceRepository extends JpaRepository<Attendance,Long> {
 
     public List<Attendance> findByemployee(Employee employee);
+
     public Attendance findByEmployeeAndDate(Employee employee, LocalDate date);
+
     public List<Attendance> findByEmployeeAndDateBetween(Employee employee, LocalDate startDate, LocalDate endDate);
+
+    public void deleteByemployee(Employee employee);
 }

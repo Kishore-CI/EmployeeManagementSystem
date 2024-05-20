@@ -12,4 +12,7 @@ public interface EarnedSalaryRepository extends JpaRepository<EarnedSalary,Long>
     public List<EarnedSalary> findByemployee(Employee employee);
 
     public EarnedSalary findByEmployeeAndMonth(Employee employee, Month month);
+
+    public void deleteByemployee(Employee employee);
+
 }

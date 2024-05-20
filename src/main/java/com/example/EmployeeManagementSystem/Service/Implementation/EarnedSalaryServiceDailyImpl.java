@@ -89,4 +89,14 @@ public class EarnedSalaryServiceDailyImpl implements EarnedSalaryService {
 //        return the calculated salary
         return earnedSalary;
     }
+
+    @Override
+    public void deleteEarnedSalary(Long id, Month month) {
+
+    }
+
+    @Override
+    public void deleteAllEarnedSalary() {
+
+    }
 }

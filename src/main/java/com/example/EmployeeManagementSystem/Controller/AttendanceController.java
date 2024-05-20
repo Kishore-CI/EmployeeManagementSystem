@@ -71,5 +71,58 @@ public class AttendanceController {
         return ResponseEntity.status(HttpStatus.OK).body(attendanceList);
     }
 
+    @RequestMapping(value = "api/v1/json/attendance/generateAttendanceForAll", method = RequestMethod.POST,
+        produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> generateAttendance(){
+//        log the request
+        log.info("generateAttendance : Request Received");
+//        generate the attendance
+        attendanceService.generateAttendanceForAll();
+//        return the response entity
+        return ResponseEntity.status(HttpStatus.OK).body("Attendance has been generated for all employees");
+    }
+
+    @RequestMapping(value = "api/v1/json/attendance/generateAttendanceForEmployee/{id}", method = RequestMethod.POST,
+        produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> generateAttendanceForEmployee(@Valid @PathVariable("id") Long id){
+//        log the request
+        log.info("generateAttendanceForEmployee : Request Received : {}",id);
+//        generate attendance only for the specific employee
+        attendanceService.generateAttendanceForEmployee(id);
+//        return the response
+        return ResponseEntity.status(HttpStatus.OK).body("Attendance records generated for employee id: "+id);
+    }
+
+    @RequestMapping(value = "api/v1/json/attendance/deleteAttendanceRecord/{id}", method = RequestMethod.DELETE,
+        produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> deleteAttendanceRecord(@Valid @PathVariable("id") Long id,
+                                                    @Valid @RequestParam LocalDate date){
+//        log the request
+        log.info("deleteAttendanceRecord : Request Received: {} {}", id,date);
+
+//        delete the attendance record for the id and date
+        attendanceService.deleteAttendance(id,date);
+
+//        return appropriate HTTP response
+        return ResponseEntity.status(HttpStatus.OK).body("Attendance record for employee id: "+id+" for date: "+date+" has been deleted");
+    }
+
+    @RequestMapping(value = "api/v1/json/attendance/deleteAllAttendanceForEmployee/{id}", method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> deleteAllAttendanceForEmployee(@Valid @PathVariable("id") Long id){
+//        log the request
+        log.info("deleteAllAttendanceForEmployee : Request Received: {}", id);
+
+//        delete all attendance record for that employee
+        attendanceService.deleteAllAttendanceForEmployee(id);
+
+//        return appropriate HTTP response
+        return ResponseEntity.status(HttpStatus.OK).body("All Attendance records for employee id: "+id+" has been deleted");
+    }
+
 
 }

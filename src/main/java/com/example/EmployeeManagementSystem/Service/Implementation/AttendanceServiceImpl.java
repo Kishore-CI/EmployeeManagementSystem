@@ -5,17 +5,20 @@ import com.example.EmployeeManagementSystem.Model.Attendance;
 import com.example.EmployeeManagementSystem.Model.Employee;
 import com.example.EmployeeManagementSystem.Repository.AttendanceRepository;
 import com.example.EmployeeManagementSystem.Service.AttendanceService;
+import com.example.EmployeeManagementSystem.Service.EarnedSalaryService;
 import com.example.EmployeeManagementSystem.Service.EmployeeService;
-import org.apache.juli.logging.Log;
+import com.example.EmployeeManagementSystem.Thread.AttendanceThreadStarter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AttendanceServiceImpl implements AttendanceService {
@@ -27,6 +30,14 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private AttendanceThreadStarter attendanceThreadStarter;
+
+    @Autowired
+    @Lazy
+    private Map<String, EarnedSalaryService> earnedSalaryServiceMap;
+
 
     @Override
     public List<Attendance> getAttendanceForemployee(Employee employee) {
@@ -120,5 +131,76 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new ApiRequestException("No employee found for id: "+id, HttpStatus.NOT_FOUND); // try custom exception
         }
         return getAttendanceForemployee(employee);
+    }
+
+    @Override
+    public void generateAttendanceForAll() {
+//        log the request
+        log.info("generateAttendance -> Request Received");
+
+//        clear the old attendance records to prevent duplication
+        attendanceRepository.deleteAll();
+
+//        clear the old earned salary records to prevent incorrect salaries from being displayed and to maintain consistency with the new attendance records that will be generated.
+        earnedSalaryServiceMap.get("earnedSalaryMonthly").deleteAllEarnedSalary();
+
+//        provide initialization parameters and start the attendance thread
+        attendanceThreadStarter.startThread("ALL",null);
+
+    }
+
+    @Override
+    @Transactional
+    public void generateAttendanceForEmployee(Long id){
+        Employee employee = employeeService.findByEmpId(id);
+        if(employee == null ){
+            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
+        }
+//            delete previous attendance records for employee
+        attendanceRepository.deleteByemployee(employee);
+
+//            delete previous earned salary records for that employee
+        earnedSalaryServiceMap.get("earnedSalaryMonthly").deleteAllEarnedSalary();
+
+//        provide initialization parameters and start the attendance thread
+        attendanceThreadStarter.startThread("ONE",employee);
+
+    }
+
+    @Override
+    @Transactional
+    public void deleteAttendance(Long id, LocalDate date) {
+        Employee employee = employeeService.findByEmpId(id);
+        if(employee ==null){
+            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
+        }
+        Attendance attendance = findAttendanceRecord(employee,date);
+        if(attendance == null){
+            throw new ApiRequestException("No attendance record found for employee id: "+id+" on date: "+date,HttpStatus.NOT_FOUND);
+        }
+        attendanceRepository.delete(attendance);
+    }
+
+    @Override
+    public void deleteAllAttendance() {
+        attendanceRepository.deleteAll();
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllAttendanceForEmployee(Long id){
+        Employee employee = employeeService.findByEmpId(id);
+        if(employee == null){
+            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
+        }
+        attendanceRepository.deleteByemployee(employee);
+    }
+
+    @Override
+    public void saveRecord(Attendance attendanceRecord) {
+//        log the request
+        log.info("saveRecord -> Request Received {}",attendanceRecord);
+//        save the record
+        attendanceRepository.save(attendanceRecord);
     }
 }

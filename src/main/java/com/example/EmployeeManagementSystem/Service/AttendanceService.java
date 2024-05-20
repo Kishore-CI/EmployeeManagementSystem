@@ -22,4 +22,16 @@ public interface AttendanceService {
     public Employee findEmployee(Long id);
 
     public List<Attendance> getAttendance(Long id);
+
+    public void generateAttendanceForAll();
+
+    public void generateAttendanceForEmployee(Long id);
+
+    public void deleteAttendance(Long id, LocalDate date);
+
+    public void deleteAllAttendance();
+
+    public void deleteAllAttendanceForEmployee(Long id);
+
+    public void saveRecord(Attendance attendanceRecord);
 }

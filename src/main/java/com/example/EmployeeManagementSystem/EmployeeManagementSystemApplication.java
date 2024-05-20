@@ -15,14 +15,14 @@ public class EmployeeManagementSystemApplication {
 	public static void main(String[] args) {
 		ApplicationContext applicationContext = SpringApplication.run(EmployeeManagementSystemApplication.class, args);
 
-		AttendanceRepository attendanceRepository = applicationContext.getBean(AttendanceRepository.class);
-		attendanceRepository.deleteAll();
-
-		EarnedSalaryRepository earnedSalaryRepository = applicationContext.getBean(EarnedSalaryRepository.class);
-		earnedSalaryRepository.deleteAllInBatch();
-
-		AttendanceThreadStarter attendanceThreadStarter = applicationContext.getBean(AttendanceThreadStarter.class);
-		attendanceThreadStarter.startThread();
+//		AttendanceRepository attendanceRepository = applicationContext.getBean(AttendanceRepository.class);
+//		attendanceRepository.deleteAll();
+//
+//		EarnedSalaryRepository earnedSalaryRepository = applicationContext.getBean(EarnedSalaryRepository.class);
+//		earnedSalaryRepository.deleteAllInBatch();
+//
+//		AttendanceThreadStarter attendanceThreadStarter = applicationContext.getBean(AttendanceThreadStarter.class);
+//		attendanceThreadStarter.startThread();
 
 
 	}

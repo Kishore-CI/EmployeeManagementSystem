@@ -127,4 +127,22 @@ public class EarnedSalaryServiceMonthlyImpl implements EarnedSalaryService {
 //        return the earned salary
         return earnedSalaryRecord.getEarned_salary();
     }
+
+    @Override
+    public void deleteEarnedSalary(Long id, Month month) {
+        Employee employee = employeeService.findByEmpId(id);
+        if(employee == null){
+            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
+        }
+        EarnedSalary earnedSalary = earnedSalaryRepository.findByEmployeeAndMonth(employee,month);
+        if(earnedSalary == null){
+            throw new ApiRequestException("No earned salary record found for employee id: "+id+" on month: "+month,HttpStatus.NOT_FOUND);
+        }
+        earnedSalaryRepository.delete(earnedSalary);
+    }
+
+    @Override
+    public void deleteAllEarnedSalary() {
+        earnedSalaryRepository.deleteAll();
+    }
 }

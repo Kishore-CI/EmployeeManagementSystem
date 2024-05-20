@@ -4,9 +4,7 @@ import com.example.EmployeeManagementSystem.Model.Employee;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public interface EmployeeService {
     public Employee saveEmployee(Map<String, Object> params);
@@ -34,4 +32,6 @@ public interface EmployeeService {
     public Employee findByPhoneNumber(Long phone);
 
     public Employee findEmployeeByPhoneNumber(Long phone);
+
+    public List<Employee> findAll();
 }

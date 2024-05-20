@@ -12,4 +12,8 @@ public interface EarnedSalaryService {
     public Double calculateEarnedSalary(Employee employee, LocalDate startdate, LocalDate endDate);
 
     public Double getEarnedSalary(Long id, boolean recalculate, Optional<Month> month, Optional<LocalDate> startDate, Optional<LocalDate> endDate);
+
+    public void deleteEarnedSalary(Long id,Month month);
+
+    public void deleteAllEarnedSalary();
 }

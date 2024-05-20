@@ -4,6 +4,8 @@ import com.example.EmployeeManagementSystem.Exception.ApiRequestException;
 import com.example.EmployeeManagementSystem.Model.Employee;
 import com.example.EmployeeManagementSystem.Service.EmployeeService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.LoggerFactory;
@@ -144,7 +146,9 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/findEmployeeByPhone", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> findEmployeeByPhoneNumber(@NotBlank @Valid @RequestParam Long phone){
+    public ResponseEntity<?> findEmployeeByPhoneNumber(@Min(value = 1000000000L, message = "Phone number is below valid length")
+                                                       @Max(value = 9999999999L, message = "Phone number is beyond valid length")
+                                                       @Valid @RequestParam Long phone){
 //        log the request
         log.info("findEmployeeByPhone : request received : {}",phone);
 
