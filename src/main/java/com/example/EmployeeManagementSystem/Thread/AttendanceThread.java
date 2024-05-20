@@ -31,12 +31,24 @@ public class AttendanceThread extends Thread{
     private String generationType;
     private Employee new_employee;
 
+    private LocalDate startDate ;
+    private LocalDate endDate ;
+    Random random = new Random();
+
     public void setGenerationType(String generationType) {
         this.generationType = generationType;
     }
 
     public void setNew_employee(Employee new_employee) {
         this.new_employee = new_employee;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     @Override
@@ -51,11 +63,7 @@ public class AttendanceThread extends Thread{
 
     private void generateAttendanceForOne(Employee employee) {
 
-        LocalDate startDate = LocalDate.of(2024,4,1);
-        LocalDate endDate = LocalDate.of(2024,6,1);
-        Random random = new Random();
-
-        for(LocalDate date = startDate;date.isBefore(endDate);date = date.plusDays(1)){
+        for(LocalDate date = startDate;!date.isAfter(endDate);date = date.plusDays(1)){
             boolean present = random.nextBoolean();
             Attendance attendanceRecord = new Attendance(employee,date,present);
             attendanceService.saveRecord(attendanceRecord);
@@ -68,13 +76,9 @@ public class AttendanceThread extends Thread{
 
         log.info("Starting attendance thread...");
 
-        LocalDate startDate = LocalDate.of(2024,4,1);
-        LocalDate endDate = LocalDate.of(2024,6,1);
-        Random random = new Random();
-
         employeeService.findAll().forEach(employee->{
             log.info("Producing attendance for employee : {}",employee);
-            for(LocalDate date = startDate;date.isBefore(endDate);date = date.plusDays(1)){
+            for(LocalDate date = startDate;!date.isAfter(endDate);date = date.plusDays(1)){
                 boolean present = random.nextBoolean();
                 Attendance attendanceRecord = new Attendance(employee,date,present);
                 attendanceService.saveRecord(attendanceRecord);

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
 import java.util.List;
 
 @Controller
@@ -74,11 +76,12 @@ public class AttendanceController {
     @RequestMapping(value = "api/v1/json/attendance/generateAttendanceForAll", method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> generateAttendance(){
+    public ResponseEntity<?> generateAttendance(@Valid @RequestParam LocalDate startDate,
+                                                @Valid @RequestParam LocalDate endDate){
 //        log the request
         log.info("generateAttendance : Request Received");
 //        generate the attendance
-        attendanceService.generateAttendanceForAll();
+        attendanceService.generateAttendanceForAll(startDate,endDate);
 //        return the response entity
         return ResponseEntity.status(HttpStatus.OK).body("Attendance has been generated for all employees");
     }
@@ -86,11 +89,13 @@ public class AttendanceController {
     @RequestMapping(value = "api/v1/json/attendance/generateAttendanceForEmployee/{id}", method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> generateAttendanceForEmployee(@Valid @PathVariable("id") Long id){
+    public ResponseEntity<?> generateAttendanceForEmployee(@Valid @PathVariable("id") Long id,
+                                                           @Valid @RequestParam LocalDate startDate,
+                                                           @Valid @RequestParam LocalDate endDate){
 //        log the request
         log.info("generateAttendanceForEmployee : Request Received : {}",id);
 //        generate attendance only for the specific employee
-        attendanceService.generateAttendanceForEmployee(id);
+        attendanceService.generateAttendanceForEmployee(id,startDate,endDate);
 //        return the response
         return ResponseEntity.status(HttpStatus.OK).body("Attendance records generated for employee id: "+id);
     }
@@ -124,5 +129,35 @@ public class AttendanceController {
         return ResponseEntity.status(HttpStatus.OK).body("All Attendance records for employee id: "+id+" has been deleted");
     }
 
+    @RequestMapping(value = "api/v1/json/attendance/getTotalDaysPresentInMonth/{id}", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> getTotalDaysPresentMonth(@Valid @PathVariable("id") Long id,
+                                                      @Valid @RequestParam Month month,
+                                                      @Valid @RequestParam Year year){
+//        log the request
+        log.info("getTotalDaysPresentMonth : request received");
+
+//        find the total days present for the month
+        Long daysPresent = attendanceService.findTotalDaysPresentInMonth(id,month, year);
+
+//        return appropriate HTTP response
+        return ResponseEntity.status(HttpStatus.OK).body(daysPresent);
+    }
+
+    @RequestMapping(value = "api/v1/json/attendance/getTotalDaysPresentInYear/{id}", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> getTotalDaysPresentYear(@Valid @PathVariable("id") Long id,
+                                                      @Valid @RequestParam Year year ){
+//        log the request
+        log.info("getTotalDaysPresentMonth : request received");
+
+//        find the total days present for the month
+        Long daysPresent = attendanceService.findTotalDaysPresentInYear(id,year);
+
+//        return appropriate HTTP response
+        return ResponseEntity.status(HttpStatus.OK).body(daysPresent);
+    }
 
 }

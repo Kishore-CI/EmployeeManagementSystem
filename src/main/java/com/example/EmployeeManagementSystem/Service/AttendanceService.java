@@ -5,6 +5,7 @@ import com.example.EmployeeManagementSystem.Model.Employee;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 import java.util.List;
 
 public interface AttendanceService {
@@ -23,9 +24,9 @@ public interface AttendanceService {
 
     public List<Attendance> getAttendance(Long id);
 
-    public void generateAttendanceForAll();
+    public void generateAttendanceForAll(LocalDate startDate, LocalDate endDate);
 
-    public void generateAttendanceForEmployee(Long id);
+    public void generateAttendanceForEmployee(Long id,LocalDate startDate, LocalDate endDate);
 
     public void deleteAttendance(Long id, LocalDate date);
 
@@ -34,4 +35,8 @@ public interface AttendanceService {
     public void deleteAllAttendanceForEmployee(Long id);
 
     public void saveRecord(Attendance attendanceRecord);
+
+    public Long findTotalDaysPresentInMonth(Long id, Month month, Year year);
+
+    public Long findTotalDaysPresentInYear(Long id, Year year);
 }

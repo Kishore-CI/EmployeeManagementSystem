@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+
 
 @Component
 public class AttendanceThreadStarter {
@@ -21,10 +23,12 @@ public class AttendanceThreadStarter {
     private AttendanceRepository attendanceRepository;
 
 
-    public void startThread(String generationType, Employee employee){
+    public void startThread(String generationType, Employee employee, LocalDate startDate, LocalDate endDate){
         AttendanceThread attendanceThread = applicationContext.getBean(AttendanceThread.class);
         attendanceThread.setGenerationType(generationType);
         attendanceThread.setNew_employee(employee);
+        attendanceThread.setStartDate(startDate);
+        attendanceThread.setEndDate(endDate);
         attendanceThread.start();
         try {
             attendanceThread.join();
