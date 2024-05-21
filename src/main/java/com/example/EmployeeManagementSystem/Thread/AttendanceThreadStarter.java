@@ -3,6 +3,7 @@ package com.example.EmployeeManagementSystem.Thread;
 import com.example.EmployeeManagementSystem.Model.Employee;
 import com.example.EmployeeManagementSystem.Repository.AttendanceRepository;
 import com.example.EmployeeManagementSystem.Repository.EmployeeRepository;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,7 @@ import java.time.LocalDate;
 public class AttendanceThreadStarter {
 
     @Autowired
-    ApplicationContext applicationContext;
+    private ObjectFactory<AttendanceThread> attendanceThreadObjectFactory;
 
     @Autowired
     private EmployeeRepository employeeRepository;
@@ -24,7 +25,7 @@ public class AttendanceThreadStarter {
 
 
     public void startThread(String generationType, Employee employee, LocalDate startDate, LocalDate endDate){
-        AttendanceThread attendanceThread = applicationContext.getBean(AttendanceThread.class);
+        AttendanceThread attendanceThread = attendanceThreadObjectFactory.getObject();
         attendanceThread.setGenerationType(generationType);
         attendanceThread.setNew_employee(employee);
         attendanceThread.setStartDate(startDate);
