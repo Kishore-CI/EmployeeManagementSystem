@@ -5,7 +5,6 @@ import com.example.EmployeeManagementSystem.Repository.AttendanceRepository;
 import com.example.EmployeeManagementSystem.Repository.EmployeeRepository;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;

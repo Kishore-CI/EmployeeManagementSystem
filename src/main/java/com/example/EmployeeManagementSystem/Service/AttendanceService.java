@@ -2,6 +2,7 @@ package com.example.EmployeeManagementSystem.Service;
 
 import com.example.EmployeeManagementSystem.Model.Attendance;
 import com.example.EmployeeManagementSystem.Model.Employee;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -24,9 +25,9 @@ public interface AttendanceService {
 
     public List<Attendance> getAttendance(Long id);
 
-    public void generateAttendanceForAll(LocalDate startDate, LocalDate endDate);
+    public List<Attendance> generateAttendanceForAll(LocalDate startDate, LocalDate endDate);
 
-    public void generateAttendanceForEmployee(Long id,LocalDate startDate, LocalDate endDate);
+    public List<Attendance> generateAttendanceForEmployee(Long id,LocalDate startDate, LocalDate endDate);
 
     public void deleteAttendance(Long id, LocalDate date);
 
@@ -39,4 +40,7 @@ public interface AttendanceService {
     public Long findTotalDaysPresentInMonth(Long id, Month month, Year year);
 
     public Long findTotalDaysPresentInYear(Long id, Year year);
+
+    @Transactional
+    void deleteEmployeeAttendanceBetween(Employee employee, LocalDate startDate, LocalDate endDate);
 }

@@ -137,7 +137,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public void generateAttendanceForAll(LocalDate startDate, LocalDate endDate) {
+    public List<Attendance> generateAttendanceForAll(LocalDate startDate, LocalDate endDate) {
 //        log the request
         log.info("generateAttendance -> Request Received");
 
@@ -155,14 +155,20 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        provide initialization parameters and start the attendance thread
         attendanceThreadStarter.startThread("ALL",null,startDate, endDate);
 
+//        fetch the newly generated attendance for all employees and return it
+        List<Attendance> attendanceList = attendanceRepository.findAll();
+
+        return attendanceList;
     }
 
     @Override
-    @Transactional
-    public void generateAttendanceForEmployee(Long id,LocalDate startDate, LocalDate endDate){
+    public List<Attendance> generateAttendanceForEmployee(Long id,LocalDate startDate, LocalDate endDate){
         Employee employee = employeeService.findByEmpId(id);
-        if(employee == null ){
-            throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
+        if(employee == null){
+            employee = employeeService.findEmployeeByPhoneNumber(id);
+            if(employee == null){
+                throw new ApiRequestException("No employee found for id / mobile number: "+id,HttpStatus.NOT_FOUND);
+            }
         }
 
 //        check if the start date is before end date
@@ -171,7 +177,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
 
 //            delete previous attendance records for employee
-        attendanceRepository.deleteByEmployeeAndDateBetween(employee,startDate,endDate);
+        deleteEmployeeAttendanceBetween(employee,startDate,endDate);
 
 //            delete previous earned salary records for that employee
         earnedSalaryServiceMap.get("earnedSalaryMonthly").deleteAllEarnedSalary();
@@ -179,6 +185,11 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        provide initialization parameters and start the attendance thread
         attendanceThreadStarter.startThread("ONE",employee,startDate, endDate);
 
+//        get the newly generated attendance for the employee
+        List<Attendance> attendanceList = attendanceRepository.findByEmployeeAndDateBetween(employee,startDate,endDate);
+
+//        return the attendance list
+        return attendanceList;
     }
 
     @Override
@@ -233,11 +244,11 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        check if the attendance records exist for the start and end of the month
         Attendance startDay = findAttendanceRecord(employee,startDate);
         if(startDay == null){
-            throw new ApiRequestException("No attendance record found for start of the month :"+month+" on year: "+year,HttpStatus.NOT_FOUND);
+            throw new ApiRequestException("No attendance record found for employee id: "+id+" for start of the month :"+month+" on year: "+year,HttpStatus.NOT_FOUND);
         }
         Attendance endDay = findAttendanceRecord(employee,endDate);
         if(endDay == null){
-            throw new ApiRequestException("No attendance record found for end of the month :"+month+" on year: "+year,HttpStatus.NOT_FOUND);
+            throw new ApiRequestException("No attendance record found  for employee id: "+id+" for end of the month :"+month+" on year: "+year,HttpStatus.NOT_FOUND);
         }
 
 //        fetch all the attendance record for the given month
@@ -266,11 +277,11 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        check if the attendance records exist for the start and end of the month
         Attendance startDay = findAttendanceRecord(employee,startDate);
         if(startDay == null){
-            throw new ApiRequestException("No attendance record found for start of the year :"+year,HttpStatus.NOT_FOUND);
+            throw new ApiRequestException("No attendance record found for employee id: "+id+"  for start of the year :"+year,HttpStatus.NOT_FOUND);
         }
         Attendance endDay = findAttendanceRecord(employee,endDate);
         if(endDay == null){
-            throw new ApiRequestException("No attendance record found for end of the month :"+year,HttpStatus.NOT_FOUND);
+            throw new ApiRequestException("No attendance record found for employee id: "+id+" for end of the year :"+year,HttpStatus.NOT_FOUND);
         }
 //        fetch all the attendance record for the given month
         List<Attendance> attendanceList = getEmployeeAttendanceBetween(employee,startDate,endDate);
@@ -280,5 +291,11 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 //        return the value
         return totalDaysPresent;
+    }
+
+    @Override
+    @Transactional
+    public void deleteEmployeeAttendanceBetween(Employee employee, LocalDate startDate, LocalDate endDate){
+        attendanceRepository.deleteByEmployeeAndDateBetween(employee,startDate,endDate);
     }
 }

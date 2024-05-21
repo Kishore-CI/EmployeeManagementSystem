@@ -25,10 +25,10 @@ public class EarnedSalaryController {
     @Autowired
     private Map<String,EarnedSalaryService> earnedSalaryService;
 
-    @RequestMapping(value = "api/v1/json/earnedSalary/calculateForMonth/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "api/v1/json/earnedSalary/calculateForMonth/", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> getEarnedSalaryForMonth(@Valid @PathVariable("id") Long id,
+    public ResponseEntity<?> getEarnedSalaryForMonth(@Valid @RequestParam Long id,
                                              @Valid @RequestParam(defaultValue = "false") boolean recalculate,
                                              @Valid @RequestParam Month month) throws IllegalArgumentException{
 //        log the request
@@ -39,10 +39,10 @@ public class EarnedSalaryController {
         return ResponseEntity.status(HttpStatus.OK).body(earnedSalary);
     }
 
-    @RequestMapping(value = "api/v1/json/earnedSalary/calculateBetween/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "api/v1/json/earnedSalary/calculateBetween/", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> getEarnedSalaryBetween(@Valid @PathVariable("id") Long id,
+    public ResponseEntity<?> getEarnedSalaryBetween(@Valid @RequestParam Long id,
                                                     @Valid @RequestParam LocalDate startDate,
                                                     @Valid @RequestParam LocalDate endDate) throws IllegalArgumentException{
 //        log the request

@@ -7,7 +7,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -48,10 +47,10 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new_employee);
     }
 
-    @RequestMapping(value = "api/v1/json/employee/updateEmployee/{id}", method = RequestMethod.PUT,
+    @RequestMapping(value = "api/v1/json/employee/updateEmployee/", method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> updateEmployee(@PathVariable("id") long id, @Valid @RequestParam(required = false) String name,
+    public ResponseEntity<?> updateEmployee(@Valid @RequestParam long id, @Valid @RequestParam(required = false) String name,
                                             @Valid @RequestParam(required = false) String email, @Valid @RequestParam(required = false) String department,
                                             @Valid @RequestParam(required = false) String position,@Valid @RequestParam(required = false) Integer salary,
                                             @Valid @RequestParam(required = false) Long phone) throws ApiRequestException {
@@ -85,10 +84,10 @@ public class EmployeeController {
 
     }
 
-    @RequestMapping(value = "api/v1/json/employee/findEmployee/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "api/v1/json/employee/findEmployee/", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> findEmployeeById(@Valid @PathVariable("id") Long id) throws ApiRequestException{
+    public ResponseEntity<?> findEmployeeById(@Valid @RequestParam Long id) throws ApiRequestException{
 //        log the request data
         log.info("findEmployee : Request Received : {}",id);
 
@@ -170,10 +169,10 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.OK).body(employeePage);
     }
 
-    @RequestMapping(value = "api/v1/json/employee/deleteEmployee/{id}", method = RequestMethod.DELETE,
+    @RequestMapping(value = "api/v1/json/employee/deleteEmployee/", method = RequestMethod.DELETE,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> deleteEmployee(@Valid @PathVariable("id") Long id) throws ApiRequestException{
+    public ResponseEntity<?> deleteEmployee(@Valid @RequestParam Long id) throws ApiRequestException{
 //        log the request data
         log.info("deleteEmployee : Request Received : " + id);
 

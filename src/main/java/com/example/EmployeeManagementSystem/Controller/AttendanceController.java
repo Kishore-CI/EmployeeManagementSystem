@@ -28,10 +28,10 @@ public class AttendanceController {
     @Autowired
     private AttendanceService attendanceService;
 
-    @RequestMapping(value = "api/v1/json/attendance/updateAttendance/{id}", method = RequestMethod.PUT,
+    @RequestMapping(value = "api/v1/json/attendance/updateAttendance/", method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> updateAttendance(@Valid @PathVariable("id") Long id,
+    public ResponseEntity<?> updateAttendance(@Valid @RequestParam Long id,
                                               @Valid @RequestParam LocalDate date,
                                               @Valid @RequestParam boolean present) throws MethodArgumentTypeMismatchException{
 
@@ -42,10 +42,10 @@ public class AttendanceController {
         return ResponseEntity.status(HttpStatus.OK).body(attendance);
     }
 
-    @RequestMapping(value = "api/v1/json/attendance/getAttendance/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "api/v1/json/attendance/getAttendance/", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> getAttendance(@Valid @PathVariable("id") Long id) throws MethodArgumentTypeMismatchException{
+    public ResponseEntity<?> getAttendance(@Valid @RequestParam Long id) throws MethodArgumentTypeMismatchException{
 
         log.info("getAttendance -> Request Received : {}",id);
 
@@ -54,10 +54,10 @@ public class AttendanceController {
         return ResponseEntity.status(HttpStatus.OK).body(attendanceList);
     }
 
-    @RequestMapping(value = "api/v1/json/attendance/updateAttendanceInBulk/{id}", method = RequestMethod.PUT,
+    @RequestMapping(value = "api/v1/json/attendance/updateAttendanceInBulk/", method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> updateAttendanceInBulk(@Valid @PathVariable("id") Long id,
+    public ResponseEntity<?> updateAttendanceInBulk(@Valid @RequestParam Long id,
                                                     @Valid @RequestParam LocalDate startDate,
                                                     @Valid @RequestParam LocalDate endDate,
                                                     @Valid @RequestParam boolean present) throws MethodArgumentTypeMismatchException{
@@ -81,29 +81,29 @@ public class AttendanceController {
 //        log the request
         log.info("generateAttendance : Request Received");
 //        generate the attendance
-        attendanceService.generateAttendanceForAll(startDate,endDate);
+        List<Attendance> attendanceList = attendanceService.generateAttendanceForAll(startDate,endDate);
 //        return the response entity
-        return ResponseEntity.status(HttpStatus.OK).body("Attendance has been generated for all employees");
+        return ResponseEntity.status(HttpStatus.OK).body(attendanceList);
     }
 
-    @RequestMapping(value = "api/v1/json/attendance/generateAttendanceForEmployee/{id}", method = RequestMethod.POST,
+    @RequestMapping(value = "api/v1/json/attendance/generateAttendanceForEmployee/", method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> generateAttendanceForEmployee(@Valid @PathVariable("id") Long id,
+    public ResponseEntity<?> generateAttendanceForEmployee(@Valid @RequestParam Long employeeIdMobile,
                                                            @Valid @RequestParam LocalDate startDate,
                                                            @Valid @RequestParam LocalDate endDate){
 //        log the request
-        log.info("generateAttendanceForEmployee : Request Received : {}",id);
+        log.info("generateAttendanceForEmployee : Request Received : {}",employeeIdMobile.getClass());
 //        generate attendance only for the specific employee
-        attendanceService.generateAttendanceForEmployee(id,startDate,endDate);
+        List<Attendance> attendanceList = attendanceService.generateAttendanceForEmployee(employeeIdMobile,startDate,endDate);
 //        return the response
-        return ResponseEntity.status(HttpStatus.OK).body("Attendance records generated for employee id: "+id);
+        return ResponseEntity.status(HttpStatus.OK).body(attendanceList);
     }
 
-    @RequestMapping(value = "api/v1/json/attendance/deleteAttendanceRecord/{id}", method = RequestMethod.DELETE,
+    @RequestMapping(value = "api/v1/json/attendance/deleteAttendanceRecord/", method = RequestMethod.DELETE,
         produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> deleteAttendanceRecord(@Valid @PathVariable("id") Long id,
+    public ResponseEntity<?> deleteAttendanceRecord(@Valid @RequestParam Long id,
                                                     @Valid @RequestParam LocalDate date){
 //        log the request
         log.info("deleteAttendanceRecord : Request Received: {} {}", id,date);
@@ -115,10 +115,10 @@ public class AttendanceController {
         return ResponseEntity.status(HttpStatus.OK).body("Attendance record for employee id: "+id+" for date: "+date+" has been deleted");
     }
 
-    @RequestMapping(value = "api/v1/json/attendance/deleteAllAttendanceForEmployee/{id}", method = RequestMethod.DELETE,
+    @RequestMapping(value = "api/v1/json/attendance/deleteAllAttendanceForEmployee/", method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> deleteAllAttendanceForEmployee(@Valid @PathVariable("id") Long id){
+    public ResponseEntity<?> deleteAllAttendanceForEmployee(@Valid @RequestParam Long id){
 //        log the request
         log.info("deleteAllAttendanceForEmployee : Request Received: {}", id);
 
@@ -129,10 +129,10 @@ public class AttendanceController {
         return ResponseEntity.status(HttpStatus.OK).body("All Attendance records for employee id: "+id+" has been deleted");
     }
 
-    @RequestMapping(value = "api/v1/json/attendance/getTotalDaysPresentInMonth/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "api/v1/json/attendance/getTotalDaysPresentInMonth/", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> getTotalDaysPresentMonth(@Valid @PathVariable("id") Long id,
+    public ResponseEntity<?> getTotalDaysPresentMonth(@Valid @RequestParam Long id,
                                                       @Valid @RequestParam Month month,
                                                       @Valid @RequestParam Year year){
 //        log the request
@@ -145,10 +145,10 @@ public class AttendanceController {
         return ResponseEntity.status(HttpStatus.OK).body(daysPresent);
     }
 
-    @RequestMapping(value = "api/v1/json/attendance/getTotalDaysPresentInYear/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "api/v1/json/attendance/getTotalDaysPresentInYear/", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> getTotalDaysPresentYear(@Valid @PathVariable("id") Long id,
+    public ResponseEntity<?> getTotalDaysPresentYear(@Valid @RequestParam Long id,
                                                       @Valid @RequestParam Year year ){
 //        log the request
         log.info("getTotalDaysPresentMonth : request received");
