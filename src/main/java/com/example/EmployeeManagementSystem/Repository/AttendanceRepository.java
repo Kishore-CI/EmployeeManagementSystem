@@ -15,5 +15,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance,Long> {
 
     public List<Attendance> findByEmployeeAndDateBetween(Employee employee, LocalDate startDate, LocalDate endDate);
 
+    public void deleteByEmployeeAndDateBetween(Employee employee,LocalDate startDate, LocalDate endDate);
+
     public void deleteByemployee(Employee employee);
 }

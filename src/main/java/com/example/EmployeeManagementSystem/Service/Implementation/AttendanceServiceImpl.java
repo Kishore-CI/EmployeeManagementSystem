@@ -171,7 +171,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
 
 //            delete previous attendance records for employee
-        attendanceRepository.deleteByemployee(employee);
+        attendanceRepository.deleteByEmployeeAndDateBetween(employee,startDate,endDate);
 
 //            delete previous earned salary records for that employee
         earnedSalaryServiceMap.get("earnedSalaryMonthly").deleteAllEarnedSalary();
