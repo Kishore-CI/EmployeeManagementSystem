@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,8 +37,12 @@ public class EarnedSalaryServiceDailyImpl implements EarnedSalaryService {
 //        get the attendance list for the employee between the specified dates
         List<Attendance> attendanceList = attendanceService.getEmployeeAttendanceBetween(employee,startdate,endDate);
 
+//        Calculate the total days in the month
+        Integer totalDaysInMonth = endDate.lengthOfMonth();
+
 //        Calculate the Daily salary of that employee
-        Double dailySalary = (double) (employee.getSalary()/30);
+        Double dailySalary = (double) employee.getSalary()/ (double) totalDaysInMonth;
+        dailySalary = Math.round(dailySalary * 100.0) / 100.0;
 
 //        Calculate the total days for which employee was present
         Double totalDaysPresent = (double) attendanceList.stream().filter(Attendance::isPresent).count();
@@ -50,7 +55,7 @@ public class EarnedSalaryServiceDailyImpl implements EarnedSalaryService {
     }
 
     @Override
-    public Double getEarnedSalary(Long id, boolean recalculate, Optional<Month> month, Optional<LocalDate> startDate, Optional<LocalDate> endDate) {
+    public Double getEarnedSalary(Long id, boolean recalculate, Optional<Month> month, Optional<Year> year, Optional<LocalDate> startDate, Optional<LocalDate> endDate) {
 //        log the request
         log.info("getEarnedSalary -> Request Received: {} {} {} {}",id,recalculate,startDate,endDate);
 

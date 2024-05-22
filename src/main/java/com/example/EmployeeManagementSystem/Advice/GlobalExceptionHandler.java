@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -69,6 +70,16 @@ public class GlobalExceptionHandler {
                 ZonedDateTime.now(ZoneId.systemDefault())
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiException);
+    }
+
+    @ExceptionHandler(value = IOException.class)
+    public ResponseEntity<Object> handleIOException(IOException exception){
+        ApiException apiException = new ApiException(
+                exception.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ZonedDateTime.now(ZoneId.systemDefault())
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiException);
     }
 
 }

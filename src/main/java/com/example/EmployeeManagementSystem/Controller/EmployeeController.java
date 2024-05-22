@@ -70,7 +70,7 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/findAllEmployees", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> findAllEmployees(@Valid @PageableDefault Pageable pageable) throws ApiRequestException{
+    public ResponseEntity<?> findAllEmployees(@Valid Pageable pageable) throws ApiRequestException{
 
 //        log the request data
         log.info("findAllEmployees : Request Received : "+ pageable);

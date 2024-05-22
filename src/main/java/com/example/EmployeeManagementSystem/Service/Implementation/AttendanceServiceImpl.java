@@ -224,7 +224,9 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public void saveRecord(Attendance attendanceRecord) {
 //        log the request
-        log.info("saveRecord -> Request Received {}",attendanceRecord);
+
+//        log.info("saveRecord -> Request Received {}",attendanceRecord);
+
 //        save the record
         attendanceRepository.save(attendanceRecord);
     }

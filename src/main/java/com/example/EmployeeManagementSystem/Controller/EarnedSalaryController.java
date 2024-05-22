@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,12 +30,13 @@ public class EarnedSalaryController {
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> getEarnedSalaryForMonth(@Valid @RequestParam Long id,
-                                             @Valid @RequestParam(defaultValue = "false") boolean recalculate,
-                                             @Valid @RequestParam Month month) throws IllegalArgumentException{
+                                                     @Valid @RequestParam(defaultValue = "false") boolean recalculate,
+                                                     @Valid @RequestParam Month month,
+                                                     @Valid @RequestParam Year year) throws IllegalArgumentException{
 //        log the request
         log.info("getEarnedSalaryForMonth : Request Received : {}",id);
 //        Calculate the earned salary
-        Double earnedSalary = earnedSalaryService.get("earnedSalaryMonthly").getEarnedSalary(id,recalculate, Optional.of(month),Optional.empty(),Optional.empty());
+        Double earnedSalary = earnedSalaryService.get("earnedSalaryMonthly").getEarnedSalary(id,recalculate, Optional.of(month),Optional.of(year),Optional.empty(),Optional.empty());
 //        Return appropriate HTTP response
         return ResponseEntity.status(HttpStatus.OK).body(earnedSalary);
     }
@@ -48,7 +50,7 @@ public class EarnedSalaryController {
 //        log the request
         log.info("getEarnedSalaryBetween : Request Received : {} {} {}",id,startDate,endDate);
 //        Calculate the earned salary
-        Double earnedSalary = earnedSalaryService.get("earnedSalaryDaily").getEarnedSalary(id,false, Optional.empty(),Optional.of(startDate),Optional.of(endDate));
+        Double earnedSalary = earnedSalaryService.get("earnedSalaryDaily").getEarnedSalary(id,false, Optional.empty(),Optional.empty(),Optional.of(startDate),Optional.of(endDate));
 //        Return appropriate HTTP response
         return ResponseEntity.status(HttpStatus.OK).body(earnedSalary);
     }

@@ -58,6 +58,9 @@ public class Employee {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee")
     private List<EarnedSalary> earned_salary;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee")
+    private List<PaySlip> paySlip;
+
     public Employee() {
     }
 

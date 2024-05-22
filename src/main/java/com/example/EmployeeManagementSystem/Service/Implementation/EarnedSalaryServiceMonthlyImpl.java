@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -40,24 +41,25 @@ public class EarnedSalaryServiceMonthlyImpl implements EarnedSalaryService {
 //        get the attendance list for the employee
         List<Attendance> attendanceList = attendanceService.getEmployeeAttendanceBetween(employee,startdate,endDate);
 
-//        calculate the total working days for which the employee was present
+//        Calculate the total days in the month
+        Integer totalDaysInMonth = endDate.lengthOfMonth();
+
+//        Calculate the Daily salary of that employee
+        Double dailySalary = (double) employee.getSalary()/ (double) totalDaysInMonth;
+        dailySalary = Math.round(dailySalary * 100.0) / 100.0;
+
+//        Calculate the total days for which employee was present
         Double totalDaysPresent = (double) attendanceList.stream().filter(Attendance::isPresent).count();
 
-//        get the ideal salary of the employee
-        Double ideal_salary = (double)employee.getSalary();
-
-//        calculate the ratio of present days to total days
-        Double salaryDaysRatio = (totalDaysPresent/31);
-
-//        calculate the earned salary
-        Double earnedSalary = (ideal_salary * salaryDaysRatio);
+//        Calculte the salary earned for days present
+        Double earnedSalary = totalDaysPresent * dailySalary;
 
 //        return the earned salary
         return earnedSalary;
     }
 
     @Override
-    public Double getEarnedSalary(Long id, boolean recalculate, Optional<Month> month, Optional<LocalDate> startDate, Optional<LocalDate> endDate) {
+    public Double getEarnedSalary(Long id, boolean recalculate, Optional<Month> month, Optional<Year> year, Optional<LocalDate> startDate, Optional<LocalDate> endDate) {
 //        log the request data
         log.info("getEarnedSalary -> {} {}", id, recalculate);
 
@@ -70,7 +72,7 @@ public class EarnedSalaryServiceMonthlyImpl implements EarnedSalaryService {
             throw new ApiRequestException("No employee found for id: " + id, HttpStatus.NOT_FOUND); // try custom exception
         }
 //        Check if the month value from the request is valid
-        int year = 2024;
+        Year yearValue = year.get();
         Month monthValue;
         if (month.isPresent()) {
             monthValue = Month.valueOf(month.get().toString().toUpperCase());
@@ -78,8 +80,8 @@ public class EarnedSalaryServiceMonthlyImpl implements EarnedSalaryService {
             throw new ApiRequestException("Month value cannot be null", HttpStatus.BAD_REQUEST);
         }
 //        get the first and last days of the month
-        YearMonth yearMonth = YearMonth.of(year, monthValue);
-        LocalDate firsDay = LocalDate.of(year, monthValue, 1);
+        YearMonth yearMonth = YearMonth.of(yearValue.getValue(), monthValue);
+        LocalDate firsDay = LocalDate.of(yearValue.getValue(), monthValue, 1);
         LocalDate lastDay = yearMonth.atEndOfMonth();
 
 //        Check if there are attendance records for the first and last days
