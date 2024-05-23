@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -46,12 +47,14 @@ public class AttendanceServiceImpl implements AttendanceService {
     public List<Attendance> getAttendanceForemployee(Employee employee) {
 //        find the attendanceList for the employee
         List<Attendance> attendanceList = attendanceRepository.findByemployee(employee);
+        log.info("getAttendanceForemployee: {}", Arrays.toString(attendanceList.toArray()));
         return attendanceList;
     }
 
     @Override
     public List<Attendance> getEmployeeAttendanceBetween(Employee employee, LocalDate startDate, LocalDate endDate) {
         List<Attendance> attendanceList = attendanceRepository.findByEmployeeAndDateBetween(employee,startDate,endDate);
+        log.info("getEmployeeAttendanceBetween: {}",Arrays.toString(attendanceList.toArray()));
         return attendanceList;
     }
 
@@ -66,6 +69,7 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new ApiRequestException("No Attendance record found for employee id: "+id+" on date: "+date,HttpStatus.NOT_FOUND); // try custom exception
         }
         attendanceRecord.setPresent(present);
+        log.info("updateAttendanceForemployee: {}",attendanceRecord);
         return attendanceRepository.save(attendanceRecord);
     }
 
@@ -105,6 +109,8 @@ public class AttendanceServiceImpl implements AttendanceService {
             attendance.setPresent(present);
             attendanceRepository.save(attendance);
         }
+
+        log.info("updateAttendanceForemployeeInBulk: {}",Arrays.toString(attendanceList.toArray()));
 //        return the updated attendance list
         return attendanceList;
     }
@@ -115,6 +121,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         if(attendance == null){
             log.info("No attendance record found for employee id : {} on date : {}",employee.getId(),date);
         }
+        log.info("findAttendanceRecord : {}",attendance);
         return attendance;
     }
 
@@ -124,6 +131,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         if(employee == null){
             log.info("No employee found for id : {}",id);
         }
+        log.info("findEmployee: {}",employee);
         return employee;
     }
 
@@ -158,6 +166,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        fetch the newly generated attendance for all employees and return it
         List<Attendance> attendanceList = attendanceRepository.findAll();
 
+        log.info("generateAttendanceForAll: {}",attendanceList);
+
         return attendanceList;
     }
 
@@ -188,6 +198,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        get the newly generated attendance for the employee
         List<Attendance> attendanceList = attendanceRepository.findByEmployeeAndDateBetween(employee,startDate,endDate);
 
+        log.info("generateAttendanceForEmployee: {}",attendanceList);
+
 //        return the attendance list
         return attendanceList;
     }
@@ -204,11 +216,13 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new ApiRequestException("No attendance record found for employee id: "+id+" on date: "+date,HttpStatus.NOT_FOUND);
         }
         attendanceRepository.delete(attendance);
+        log.info("deleteAttendance: {}",attendance);
     }
 
     @Override
     public void deleteAllAttendance() {
         attendanceRepository.deleteAll();
+        log.info("deleteAllAttendance -> Completed");
     }
 
     @Override
@@ -219,16 +233,17 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
         }
         attendanceRepository.deleteByemployee(employee);
+        log.info("deleteAllAttendanceForEmployee -> completed for: {}",employee);
     }
 
     @Override
     public void saveRecord(Attendance attendanceRecord) {
 //        log the request
 
-//        log.info("saveRecord -> Request Received {}",attendanceRecord);
-
 //        save the record
         attendanceRepository.save(attendanceRecord);
+
+        log.info("savedRecord -> completed: {}",attendanceRecord);
     }
 
     @Override
@@ -258,6 +273,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 //        count total days present for the month
         Long totalDaysPresent = attendanceList.stream().filter(Attendance::isPresent).count();
+
+        log.info("findTotalDaysPresentInMonth : {} {} {}",employee,yearMonth,totalDaysPresent);
 
 //        return the value
         return totalDaysPresent;
@@ -291,6 +308,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        count total days present for the month
         Long totalDaysPresent = attendanceList.stream().filter(Attendance::isPresent).count();
 
+        log.info("findTotalDaysPresentInMonth : {} {} {}",employee,year,totalDaysPresent);
+
 //        return the value
         return totalDaysPresent;
     }
@@ -299,5 +318,6 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Transactional
     public void deleteEmployeeAttendanceBetween(Employee employee, LocalDate startDate, LocalDate endDate){
         attendanceRepository.deleteByEmployeeAndDateBetween(employee,startDate,endDate);
+        log.info("deleteEmployeeAttendanceBetween : {} {} {}",employee,startDate,endDate);
     }
 }

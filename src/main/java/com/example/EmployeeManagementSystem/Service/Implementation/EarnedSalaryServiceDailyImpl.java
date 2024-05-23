@@ -2,7 +2,9 @@ package com.example.EmployeeManagementSystem.Service.Implementation;
 
 import com.example.EmployeeManagementSystem.Exception.ApiRequestException;
 import com.example.EmployeeManagementSystem.Model.Attendance;
+import com.example.EmployeeManagementSystem.Model.EarnedSalary;
 import com.example.EmployeeManagementSystem.Model.Employee;
+import com.example.EmployeeManagementSystem.Repository.EarnedSalaryRepository;
 import com.example.EmployeeManagementSystem.Service.AttendanceService;
 import com.example.EmployeeManagementSystem.Service.EarnedSalaryService;
 import com.example.EmployeeManagementSystem.Service.EmployeeService;
@@ -30,6 +32,9 @@ public class EarnedSalaryServiceDailyImpl implements EarnedSalaryService {
     @Autowired
     private AttendanceService attendanceService;
 
+    @Autowired
+    private EarnedSalaryRepository earnedSalaryRepository;
+
 
     @Override
     public Double calculateEarnedSalary(Employee employee, LocalDate startdate, LocalDate endDate) {
@@ -49,6 +54,8 @@ public class EarnedSalaryServiceDailyImpl implements EarnedSalaryService {
 
 //        Calculte the salary earned for days present
         Double earnedSalary = totalDaysPresent * dailySalary;
+
+        log.info("calculateEarnedSalary: {}",earnedSalary);
 
 //        return the calculate salary earned
         return earnedSalary;
@@ -102,6 +109,7 @@ public class EarnedSalaryServiceDailyImpl implements EarnedSalaryService {
 
     @Override
     public void deleteAllEarnedSalary() {
-
+        earnedSalaryRepository.deleteAll();
+        log.info("deleteAllEarnedSalary -> completed");
     }
 }

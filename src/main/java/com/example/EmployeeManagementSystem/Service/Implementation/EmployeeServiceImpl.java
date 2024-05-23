@@ -136,6 +136,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        Save the newly created employee using the repository
         Employee saved_employee = employeeRepository.save(new_employee);
 
+        log.info("saveEmployee -> Record created: {}",new_employee);
+
 //        return the saved employee
         return saved_employee;
     }
@@ -146,6 +148,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if(employee == null){
             log.info("findByEmpId -> No employee with the id : {} found",id);
         }
+        log.info("findByEmpId -> Employee found: {}",employee);
         return employee;
     }
 
@@ -166,7 +169,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employee == null){
             log.info("findByEmail -> No employee with the email : {}",email);
         }
-
+        log.info("findByEmail -> Employee found: {}",employee);
         return employee;
     }
 
@@ -180,7 +183,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             log.info("No employees found for department : {} on page : {}",department,pageable.getPageNumber());
             throw new ApiRequestException("No employees found for department: "+department+" on page: "+pageable.getPageNumber(),HttpStatus.NOT_FOUND);
         }
-
+        log.info("findByDepartment -> Employees found: {}",employeePage);
         return employeePage;
     }
 
@@ -196,6 +199,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             log.info("No employees found on the specified page : {}",pageable.getPageNumber());
             throw new ApiRequestException("No employees found on page: "+pageable.getPageNumber(),HttpStatus.NOT_FOUND);
         }
+        log.info("findAllEmployees -> Employees found: {}",employeePage);
         return employeePage;
     }
 
@@ -213,6 +217,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //      Delete the employee that was found.
         employeeRepository.delete(employee);
 
+
 //        log the message
         log.info("deleteEmployee -> Employee with id : {} has been deleted",id);
     }
@@ -221,6 +226,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void deleteAllEmployees() {
 //        delete all Employee records
         employeeRepository.deleteAll();
+        log.info("deleteAllEmployees -> completed");
     }
 
     @Override
@@ -231,11 +237,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 //      If employee is present update params as received from the request and return the update employee object
         if(employee != null){
-
-//            if(params.containsKey("id") && params.get("id") != null){
-//                employee.setId(((Integer)params.get("id")).longValue());
-//            }
-//                  --> Produces error on hibernate. Cant change primary key / identifier
 
             if(email!=null){
                 Employee duplicate_employee = findByEmail(email);
@@ -283,6 +284,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 //            save the changes made to the employee
             employeeRepository.save(employee);
 
+            log.info("updateEmployee -> Record updated: {}",employee);
+
             return employee;
         }
 
@@ -303,6 +306,8 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new ApiRequestException("No employees found on page: "+pageable.getPageNumber(),HttpStatus.NOT_FOUND);
         }
 
+        log.info("findByDepartmentAndPosition -> Employees found: {}",employeePage);
+
         return employeePage;
     }
 
@@ -315,6 +320,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             log.info("No employees found for salary range : {} - {}, on page : {}",minSalary,maxSalary,pageable.getPageNumber());
             throw new ApiRequestException("No employees found on page: "+pageable.getPageNumber(),HttpStatus.NOT_FOUND);
         }
+
+        log.info("findBySalaryBetween -> Employees found: {}",employeePage);
+
         return employeePage;
     }
 
@@ -324,6 +332,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         if(employee==null){
             log.info("findByPhoneNumber -> No employee with phone number: {}",phone);
         }
+
+        log.info("findByPhoneNumber -> Employee found: {}",employee);
+
         return employee;
     }
 
@@ -341,6 +352,5 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<Employee> findAll() {
         return employeeRepository.findAll();
     }
-
 
 }

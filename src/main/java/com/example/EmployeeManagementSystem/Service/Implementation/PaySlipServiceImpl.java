@@ -3,6 +3,7 @@ package com.example.EmployeeManagementSystem.Service.Implementation;
 import com.example.EmployeeManagementSystem.Exception.ApiRequestException;
 import com.example.EmployeeManagementSystem.Model.Attendance;
 import com.example.EmployeeManagementSystem.Model.Employee;
+import com.example.EmployeeManagementSystem.Model.PaySlip;
 import com.example.EmployeeManagementSystem.Repository.PaySlipRepository;
 import com.example.EmployeeManagementSystem.Service.AttendanceService;
 import com.example.EmployeeManagementSystem.Service.EarnedSalaryService;
@@ -49,7 +50,7 @@ public class PaySlipServiceImpl implements PaySlipService {
     private static final String TEMPLATEPATH =  "C:\\Users\\LENOVO\\Desktop\\Payslip_template.docx";
 
     @Override
-    public byte[] generatePaySlipForEmployee(Long id, Month month, Year year) throws IOException {
+    public PaySlip generatePaySlipForEmployee(Long id, Month month, Year year) throws IOException {
 //        log the request
         log.info("generatePaySlipForEmployee -> request received");
 
@@ -99,7 +100,11 @@ public class PaySlipServiceImpl implements PaySlipService {
         FileOutputStream fileOutputStream = new FileOutputStream(OUTPUTPATH);
         fileOutputStream.write(paySlipPdfBytes);
 
-        return paySlipPdfBytes;
+//        create and return a payslip object
+        PaySlip paySlip = new PaySlip(month,year,employee,paySlipPdfBytes);
+
+
+        return paySlip;
     }
 
 
@@ -203,7 +208,7 @@ public class PaySlipServiceImpl implements PaySlipService {
         paragraphList.set(0,heading);
         paragraphList.set(1,company);
         paragraphList.set(13,salaryHeading);
-        paragraphList.set(17, netEarnings);
+        paragraphList.set(17,netEarnings);
         paragraphList.set(20,signatureHeading);
         paragraphList.set(21,signatureUnderline);
 

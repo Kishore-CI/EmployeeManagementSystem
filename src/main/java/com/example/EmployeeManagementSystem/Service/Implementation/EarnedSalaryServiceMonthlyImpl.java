@@ -54,6 +54,8 @@ public class EarnedSalaryServiceMonthlyImpl implements EarnedSalaryService {
 //        Calculte the salary earned for days present
         Double earnedSalary = totalDaysPresent * dailySalary;
 
+        log.info("calculateEarnedSalary: {}",earnedSalary);
+
 //        return the earned salary
         return earnedSalary;
     }
@@ -106,6 +108,8 @@ public class EarnedSalaryServiceMonthlyImpl implements EarnedSalaryService {
 //            save the record
             earnedSalaryRepository.save(newEarnedSalaryRecord);
 
+            log.info("getEarnedSalary -> Record created: {}",newEarnedSalaryRecord);
+
 //            return the newly calculated earnedSalary
             return earnedSalary;
 
@@ -124,9 +128,11 @@ public class EarnedSalaryServiceMonthlyImpl implements EarnedSalaryService {
 
 //            save the updated record
             earnedSalaryRepository.save(earnedSalaryRecord);
+            log.info("getEarnedSalary -> Record updated after recalculation: {}",earnedSalaryRecord);
         }
 
 //        return the earned salary
+        log.info("getEarnedSalary -> Record found: {}",earnedSalaryRecord);
         return earnedSalaryRecord.getEarned_salary();
     }
 
@@ -146,5 +152,6 @@ public class EarnedSalaryServiceMonthlyImpl implements EarnedSalaryService {
     @Override
     public void deleteAllEarnedSalary() {
         earnedSalaryRepository.deleteAll();
+        log.info("deleteAllEarnedSalary -> completed");
     }
 }

@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PageableDefault;
@@ -70,16 +71,16 @@ public class EmployeeController {
     @RequestMapping(value = "api/v1/json/employee/findAllEmployees", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<?> findAllEmployees(@Valid Pageable pageable) throws ApiRequestException{
+    public ResponseEntity<?> findAllEmployees(@Valid @RequestParam Integer page, @Valid @RequestParam Integer size) throws ApiRequestException{
 
 //        log the request data
-        log.info("findAllEmployees : Request Received : "+ pageable);
+        log.info("findAllEmployees : Request Received : "+ page+size);
 
 //        Find all employees in the given page with given page size
-        Page<Employee> employeePage = employeeService.findAllEmployees(pageable);
+        PageRequest pageRequest = PageRequest.of(page,size);
+        Page<Employee> employeePage = employeeService.findAllEmployees(pageRequest);
 
 //        Return the response object with appropriate HTTP status
-
         return ResponseEntity.status(HttpStatus.OK).body(employeePage);
 
     }

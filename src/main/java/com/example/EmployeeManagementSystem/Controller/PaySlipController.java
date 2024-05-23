@@ -1,10 +1,12 @@
 package com.example.EmployeeManagementSystem.Controller;
 
+import com.example.EmployeeManagementSystem.Model.PaySlip;
 import com.example.EmployeeManagementSystem.Service.PaySlipService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,14 +39,17 @@ public class PaySlipController {
         log.info("generatePaySlip : request received : {} {} {}",id,month,year);
 
 //        generate the payslip
-        byte[] paySlip = paySlipService.generatePaySlipForEmployee(id,month,year);
+        PaySlip paySlip = paySlipService.generatePaySlipForEmployee(id,month,year);
 
 //        Set the Http headers for the response
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=document.pdf");
-        httpHeaders.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
+        httpHeaders.add("Employee Name",paySlip.getEmployee().getName());
+        httpHeaders.add("Employee Id",String.valueOf(paySlip.getEmployee().getId()));
+        httpHeaders.add("Pay Period",paySlip.getMonth()+" "+paySlip.getYear());
+        httpHeaders.add("Content-Type",MediaType.APPLICATION_PDF.toString());
 
 //        return the appropriate http response
-        return new ResponseEntity<>(paySlip,httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(paySlip.getPayslipdata(), httpHeaders, HttpStatus.OK);
     }
 }
