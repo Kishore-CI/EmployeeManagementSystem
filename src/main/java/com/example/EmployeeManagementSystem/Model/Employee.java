@@ -52,13 +52,13 @@ public class Employee {
     private int salary;
 
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee",orphanRemoval = true)
     private List<Attendance> attendanceList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee",orphanRemoval = true)
     private List<EarnedSalary> earned_salary;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee",orphanRemoval = true)
     private List<PaySlip> paySlip;
 
     public Employee() {

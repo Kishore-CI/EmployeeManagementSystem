@@ -20,18 +20,21 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
+import java.time.*;
 import java.util.*;
 
 @Service
 public class PaySlipServiceImpl implements PaySlipService {
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     @Autowired
     private EmployeeService employeeService;
@@ -47,7 +50,18 @@ public class PaySlipServiceImpl implements PaySlipService {
 
     private Logger log = LoggerFactory.getLogger(PaySlipServiceImpl.class);
 
-    private static final String TEMPLATEPATH =  "C:\\Users\\LENOVO\\Desktop\\Payslip_template.docx";
+    private static final String TEMPLATEPATH =  "classpath:static/Payslip_template.docx";
+
+    @Override
+    @Scheduled(cron = "0 */5 * * * *")
+    public void autoGeneratePayslips() throws IOException{
+        Month month = Month.APRIL;
+        Year year = Year.of(2024);
+        for (Employee employee : employeeService.findAll()) {
+            generatePaySlipForEmployee(employee.getId(), month, year);
+            log.info("autoGeneratePayslips -> completed for employee : {}",employee.getId());
+        }
+    }
 
     @Override
     public PaySlip generatePaySlipForEmployee(Long id, Month month, Year year) throws IOException {
@@ -82,7 +96,9 @@ public class PaySlipServiceImpl implements PaySlipService {
         }
 
 //        initialize the output path for payslip that will be generated
-        String OUTPUTPATH = "C:\\Users\\LENOVO\\Desktop\\Output_Payslips\\EmpId_" + employee.getId() + "_" + month + "_" + year+".pdf";
+        ZonedDateTime timeSuffix = ZonedDateTime.now(ZoneId.systemDefault());
+        String OUTPUTPATH = "C:\\Users\\lKK97\\OneDrive\\Desktop\\CustomerInspire\\OutputPayslips\\Payslip_EmpId_"
+                + employee.getId() + "_" + month + "_" + year+"_"+timeSuffix.getHour()+"_"+timeSuffix.getMinute()+".pdf";
 
 //        Initialize the replacement map with necessary params
         Map<String,String> replacementMap = generateReplacementMap(employee,yearMonth,month,year,startDate,endDate);
@@ -109,8 +125,9 @@ public class PaySlipServiceImpl implements PaySlipService {
 
 
     private String readTemplateFileContent() throws IOException {
-        FileInputStream fileInputStream = new FileInputStream(TEMPLATEPATH);
-        XWPFDocument document = new XWPFDocument(fileInputStream);
+        Resource templateResource = resourceLoader.getResource(TEMPLATEPATH);
+//        FileInputStream fileInputStream = new FileInputStream(templateResource.getInputStream());
+        XWPFDocument document = new XWPFDocument(templateResource.getInputStream());
         XWPFWordExtractor extractor = new XWPFWordExtractor(document);
         String content = extractor.getText();
         extractor.close();
