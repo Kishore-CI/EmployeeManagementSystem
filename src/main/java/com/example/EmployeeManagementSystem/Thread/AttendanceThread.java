@@ -35,24 +35,30 @@ public class AttendanceThread extends Thread{
     private LocalDate endDate ;
     Random random = new Random();
 
+//    sets the attendance generation type : ONE or ALL
     public void setGenerationType(String generationType) {
         this.generationType = generationType;
     }
 
+//    Sets the employee object for which attendance will be generated
     public void setNew_employee(Employee new_employee) {
         this.new_employee = new_employee;
     }
 
+//    Sets the start date for the time range
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
+//    Sets the end date for the time range
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
+//    Thread entry point
     @Override
     public void run(){
+//        Determines the type of attendance generation: generate attendance for one employee or all employees
         if(generationType.equals("ALL")){
             generateAttendanceForAll();
         }
@@ -61,6 +67,7 @@ public class AttendanceThread extends Thread{
         }
     }
 
+//    generates the attendance for one employee for the given time range
     private void generateAttendanceForOne(Employee employee) {
 
         for(LocalDate date = startDate;!date.isAfter(endDate);date = date.plusDays(1)){
@@ -72,6 +79,7 @@ public class AttendanceThread extends Thread{
         log.info("Attendance population for employee id: {} is complete",employee.getId());
     }
 
+//    generates the attendance for all the employees for the given time range
     public void generateAttendanceForAll(){
 
         log.info("Starting attendance thread...");

@@ -24,12 +24,24 @@ public class AttendanceThreadStarter {
 
 
     public void startThread(String generationType, Employee employee, LocalDate startDate, LocalDate endDate){
+//        Initialize a new attendance thread object
         AttendanceThread attendanceThread = attendanceThreadObjectFactory.getObject();
+//        sets the generation type
         attendanceThread.setGenerationType(generationType);
+
+//        sets the employee object
         attendanceThread.setNew_employee(employee);
+
+//        sets the start date
         attendanceThread.setStartDate(startDate);
+
+//        sets the end date
         attendanceThread.setEndDate(endDate);
+
+//        starts the thread
         attendanceThread.start();
+
+//      Waits for thread execution completion
         try {
             attendanceThread.join();
         } catch (InterruptedException e) {

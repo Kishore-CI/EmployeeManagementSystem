@@ -104,11 +104,12 @@ public class EarnedSalaryServiceDailyImpl implements EarnedSalaryService {
 
     @Override
     public void deleteEarnedSalary(Long id, Month month) {
-
+//        Not Applicable to the current implementation
     }
 
     @Override
     public void deleteAllEarnedSalary() {
+//        deletes all the earned salary records
         earnedSalaryRepository.deleteAll();
         log.info("deleteAllEarnedSalary -> completed");
     }

@@ -55,8 +55,11 @@ public class PaySlipServiceImpl implements PaySlipService {
     @Override
     @Scheduled(cron = "0 */5 * * * *")
     public void autoGeneratePayslips() throws IOException{
+
         Month month = Month.APRIL;
         Year year = Year.of(2024);
+
+//        iterate through all the employees and generate payslips for them for the month of April 2024
         for (Employee employee : employeeService.findAll()) {
             generatePaySlipForEmployee(employee.getId(), month, year);
             log.info("autoGeneratePayslips -> completed for employee : {}",employee.getId());
@@ -119,33 +122,49 @@ public class PaySlipServiceImpl implements PaySlipService {
 //        create and return a payslip object
         PaySlip paySlip = new PaySlip(month,year,employee,paySlipPdfBytes);
 
-
         return paySlip;
     }
 
-
+//    reads the template file content as a string and returns it.
     private String readTemplateFileContent() throws IOException {
+
+//        convert the template.docx file content to a resource to be used in a XWPF Document
         Resource templateResource = resourceLoader.getResource(TEMPLATEPATH);
-//        FileInputStream fileInputStream = new FileInputStream(templateResource.getInputStream());
+
+//        Initialize the XWPF document object
         XWPFDocument document = new XWPFDocument(templateResource.getInputStream());
+
+//        initialize the word extractor to retrieve the content as a string
         XWPFWordExtractor extractor = new XWPFWordExtractor(document);
+
+//        get the string content from the extractore
         String content = extractor.getText();
+
+//        close the instance
         extractor.close();
+
         return content;
     }
 
+//    Replaces the placeholders in template file content with employee's attributes and returns the modified content string
     private String replacePlaceholders(Map<String,String> replacementMap,String content){
+
+//        iterates through each entry on the replacement map and replaces it in the template content string
         for(Map.Entry<String,String> entry: replacementMap.entrySet()){
             content = content.replace(entry.getKey(),entry.getValue());
         }
+
         return content;
     }
 
+//    Generates the map which will contain the placeholders and the employee attributes to replace them with
     private Map<String,String> generateReplacementMap(Employee employee,YearMonth yearMonth, Month month,
                                                       Year year, LocalDate startDate, LocalDate endDate){
 
+//        initialize a new hashmap
         Map<String,String> replacementMap = new HashMap<>();
 
+//        adds placeholders and their replacement attributes to the map
         replacementMap.put("{name}", employee.getName());
         replacementMap.put("{department}", employee.getDepartment());
         replacementMap.put("{position}", employee.getPosition());
@@ -153,13 +172,17 @@ public class PaySlipServiceImpl implements PaySlipService {
         replacementMap.put("{workingdays}",String.valueOf(yearMonth.lengthOfMonth()));
         replacementMap.put("{monthlysalary}",String.valueOf(employee.getSalary()));
 
+//        calculates the daily salary to be entered for replacement
         Double dailySalary = (double) employee.getSalary() / (double) yearMonth.lengthOfMonth();
         dailySalary = Math.round(dailySalary*100.0)/100.0;
 
+//        calculates the total days present for the employee
         Long presentDays = attendanceService.findTotalDaysPresentInMonth(employee.getId(),month,year);
 
+//        calculates the salary earned for the month as a product of total days present and the daily salary
         Double earnedSalary = earnedSalaryService.get("earnedSalaryMonthly").calculateEarnedSalary(employee,startDate,endDate);
 
+//        adds the calculated values to the map
         replacementMap.put("{dailysalary}",String.valueOf(dailySalary));
         replacementMap.put("{presentdays}",String.valueOf(presentDays));
         replacementMap.put("{earnedsalary}",String.valueOf(earnedSalary));
@@ -167,34 +190,48 @@ public class PaySlipServiceImpl implements PaySlipService {
         return replacementMap;
     }
 
+//    generates the PdfFile as a byte array that will be used to send a response
     private byte[] generatePdfFile(String pdfContent) {
+//        initialize the byte array output stream
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
+//        initializes the pdf writer object using the output stream
         PdfWriter pdfWriter = new PdfWriter(byteArrayOutputStream);
 
+//        split the pdfContent into individual paragraphs on every new line
         String[] paragraphStrings = pdfContent.split("\\n");
+
+//        convert the array to a list for further processing needs
         List<Paragraph> paragraphList = new ArrayList<>();
         for(String paragraphString : paragraphStrings){
             paragraphList.add(new Paragraph(paragraphString));
         }
 
+//        format the list of paragraphs as required
         paragraphList = formatParagraphsAndDateStamp(paragraphList);
 
+//        initialize a pdfDocument object from the pdfWriter
         PdfDocument pdfDocument = new PdfDocument(pdfWriter);
 
+//        initialize a new document object
         Document document = new Document(pdfDocument);
 
+//        modify page size of the document to match content size
         pdfDocument.setDefaultPageSize(PageSize.A4);
 
+//        add all the formatted paragraphs in the paragraph list to the document
         paragraphList.forEach(document::add);
 
+//        close the document instance
         document.close();
 
+//        convert the output stream to a byte array to be returned
         byte[] pdfBytes = byteArrayOutputStream.toByteArray();
 
         return pdfBytes;
     }
 
+//    formats a list of paragraphs containing key sections of the template content
     private List<Paragraph> formatParagraphsAndDateStamp(List<Paragraph> paragraphList){
 //        get the sections that need to be formatted
         Paragraph heading = paragraphList.get(0);

@@ -53,6 +53,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public List<Attendance> getEmployeeAttendanceBetween(Employee employee, LocalDate startDate, LocalDate endDate) {
+//        finds the attendance record for an employee between the given dates
         List<Attendance> attendanceList = attendanceRepository.findByEmployeeAndDateBetween(employee,startDate,endDate);
         log.info("getEmployeeAttendanceBetween: {}",Arrays.toString(attendanceList.toArray()));
         return attendanceList;
@@ -60,14 +61,17 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public Attendance updateAttendanceForemployee(Long id, LocalDate date, boolean present) {
+//        Checks if the employee exists
         Employee employee = findEmployee(id);
         if(employee == null){
             throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
         }
+//        checks if the attendance record exists
         Attendance attendanceRecord = findAttendanceRecord(employee,date);
         if(attendanceRecord == null){
             throw new ApiRequestException("No Attendance record found for employee id: "+id+" on date: "+date,HttpStatus.NOT_FOUND); // try custom exception
         }
+//        Updates the present value
         attendanceRecord.setPresent(present);
         log.info("updateAttendanceForemployee: {}",attendanceRecord);
         return attendanceRepository.save(attendanceRecord);
@@ -125,8 +129,8 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendance;
     }
 
-    @Override
-    public Employee findEmployee(Long id) {
+//    utility method that finds an employee by the given id
+    private Employee findEmployee(Long id) {
         Employee employee = employeeService.findByEmpId(id);
         if(employee == null){
             log.info("No employee found for id : {}",id);
@@ -207,20 +211,24 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     @Transactional
     public void deleteAttendance(Long id, LocalDate date) {
+//        checks if the employee exists
         Employee employee = employeeService.findByEmpId(id);
         if(employee ==null){
             throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
         }
+//        checks if the attendance records exist
         Attendance attendance = findAttendanceRecord(employee,date);
         if(attendance == null){
             throw new ApiRequestException("No attendance record found for employee id: "+id+" on date: "+date,HttpStatus.NOT_FOUND);
         }
+//        deletes the attendance record
         attendanceRepository.delete(attendance);
         log.info("deleteAttendance: {}",attendance);
     }
 
     @Override
     public void deleteAllAttendance() {
+//        deletes all the attendance for the all the employees
         attendanceRepository.deleteAll();
         log.info("deleteAllAttendance -> Completed");
     }
@@ -228,11 +236,16 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     @Transactional
     public void deleteAllAttendanceForEmployee(Long id){
+//        check if the employee exists
         Employee employee = employeeService.findByEmpId(id);
+
         if(employee == null){
             throw new ApiRequestException("No employee found for id: "+id,HttpStatus.NOT_FOUND);
         }
+
+//        Deletes the records for the employee
         attendanceRepository.deleteByemployee(employee);
+
         log.info("deleteAllAttendanceForEmployee -> completed for: {}",employee);
     }
 
